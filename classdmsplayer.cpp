@@ -1,0 +1,436 @@
+#include "classdmsplayer.h"
+#include <process.h>
+#include <cmath>
+#include <cstdio>
+DMSPlayer::DMSPlayer(DSCreated* dsCreated, UINT32 BufferSeconds)
+{
+	HRESULT hr;
+	ReadyForExit = EnableLevel = Playing = ThreadWait = FALSE;
+	pDestBuffer = NULL;
+	if (!dsCreated) return;
+	memset(&Sound, 0, sizeof(Sound));
+	memset(&DmspDesc, 0, sizeof(DSBUFFERDESC));
+	DmspDesc.dwSize = sizeof(DSBUFFERDESC);
+	DmspDesc.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_LOCDEFER | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLVOLUME;
+	DmspDesc.dwReserved = 0;
+	DmspDesc.lpwfxFormat = dsCreated->GetFormatPtr();
+	DmspDesc.guid3DAlgorithm = GUID_NULL;
+	DmspDesc.dwBufferBytes = BufferSeconds * nAvgBytesPerSecond;
+	dsUsed = dsCreated;
+	dsUsed->AddRef();
+	hr = dsCreated->GetDSPtr()->CreateSoundBuffer(&DmspDesc, &DSBuffer, NULL);
+	if (FAILED(hr)) 
+	{ 
+		dsUsed->Release();
+		return; 
+	}
+
+	switch (dsCreated->GetEnableLevel())
+	{
+	case 0:
+		return;
+	case 1:
+		break;
+	case 2:
+		DSBuffer->SetFormat(dsCreated->GetFormatPtr());
+		break;
+	default:
+		break;
+	}
+	EnableLevel = TRUE;
+
+	return;
+}
+
+void DMSPlayer::SafeSleep(INT32 nms)
+{
+	INT32 t, m,i;
+	if (nms < 0) nms = 0;
+	t = nms / 20;
+	m = nms % 20;
+	for (i = 1; i <= t; i++)
+	{	
+		Sleep(20);
+		if (!Playing|ReadyForExit)return;
+	}
+	Sleep(m);
+}
+
+DMSPlayer::~DMSPlayer()
+{
+		//MUST wait thread return in child class
+	if (EnableLevel)
+	{
+		EnableLevel = FALSE;
+		DSBuffer->Release();
+		dsUsed->Release();
+	}
+}
+
+void DMSPlayer::SetVolume(INT32 Volume)
+{
+	if (!EnableLevel) return;
+	if (Volume > 100) Volume = 100;
+	if (Volume < 0) Volume = 0;
+	Volume = 10000 * pow(Volume / 100.0, 0.17);
+	if (Volume > 10000) Volume = 10000;
+	if (Volume < 0) Volume = 0;
+	DSBuffer->SetVolume(-10000 + Volume);
+}
+
+INT32 DMSPlayer::GetVolume()
+{
+	LONG Volume;
+	if (!EnableLevel) return -1;
+	DSBuffer->GetVolume(&Volume);
+	Volume = (10000 + Volume);
+	Volume = 100 * pow(Volume / 10000.0, 1.0 / 0.17) + 0.5;
+	if (Volume > 100) Volume = 100;
+	if (Volume < 0) Volume = 0;
+	return Volume;
+}
+
+ BOOL DMSPlayer::isEnable() { return EnableLevel; }
+
+//if created successful
+
+ BOOL DMSPlayer::isPlaying() { return Playing; }
+
+ void DSCreated::AddRef() { Reference++; }
+
+void DSCreated::Release() 
+{
+	Reference--; 
+	if (!Reference)
+	{
+		if(pDSound)
+			pDSound->Release();
+		delete this;
+	}
+}
+
+DSCreated::DSCreated(HWND hwnd)
+{
+	HRESULT hr;
+	EnableLevel = 0;
+	Reference = 1;
+	memset(&Format, 0, sizeof(WAVEFORMATEX));
+	Format.cbSize = 0;
+	Format.wFormatTag = WAVE_FORMAT_PCM;
+	Format.nChannels = 2;
+	Format.nSamplesPerSec = 44100;
+	Format.wBitsPerSample = 16;
+	Format.nBlockAlign = Format.wBitsPerSample*Format.nChannels / 8;
+	Format.nAvgBytesPerSec = Format.nSamplesPerSec*Format.nBlockAlign;
+	hr = DirectSoundCreate(NULL, &pDSound, NULL);
+	if (FAILED(hr)) return;
+	hr = pDSound->SetCooperativeLevel(hwnd, DSSCL_PRIORITY);
+	if (SUCCEEDED(hr))
+	{
+		EnableLevel = 2;
+
+	}
+	else
+	{
+		hr = pDSound->SetCooperativeLevel(hwnd, DSSCL_NORMAL);
+		if (FAILED(hr))
+		{
+			pDSound->Release();
+			return;
+		}
+		EnableLevel = 1;
+	}
+}
+
+DSCreated::~DSCreated()
+{
+	EnableLevel = 0;
+}
+
+ WAVEFORMATEX * DSCreated::GetFormatPtr() { return &Format; }
+
+ LPDIRECTSOUND DSCreated::GetDSPtr() { return pDSound; }
+
+ DWORD DSCreated::GetEnableLevel() { return EnableLevel; }
+
+ UINT32 DSCreated::GetReferenceNum() { return Reference; }
+
+
+DSPlayer::DSPlayer(DSCreated * dsCreated, UINT32 MaximumSeconds):DMSPlayer(dsCreated, MaximumSeconds)
+{
+}
+
+DSPlayer::~DSPlayer()
+{
+	if (EnableLevel)
+	{
+		DSBuffer->Stop();
+		DSBuffer->SetCurrentPosition(0);
+		ReadyForExit = 1;
+		while (ReadyForExit != 2 && Playing);
+	}
+	
+}
+
+void DSPlayer::PlayThread()
+{
+	DWORD P1, P2;
+	DWORD buffersize = min(DmspDesc.dwBufferBytes, Sound.size);
+	Playing = TRUE;
+	if (ReadyForExit) 
+	{ 
+		ReadyForExit = 2;
+		return; 
+	}
+	if (!Sound.base || Sound.size <= 0)
+	{
+		Playing = FALSE;
+		ThreadWait = FALSE;
+		return;
+	}
+	DSBuffer->SetCurrentPosition(0);
+	DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
+	memcpy(pDestBuffer, Sound.base + Sound.offset, buffersize);
+	DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
+	ThreadWait = FALSE;
+	DSBuffer->Play(0, 0, 0);
+	SafeSleep(INT32(UINT64(buffersize) * 1000 /  nAvgBytesPerSecond) - 50);
+	while (1)
+	{
+		if (ReadyForExit)
+		{
+			ReadyForExit = 2;
+			return;
+		}
+		DSBuffer->GetCurrentPosition(&P1, &P2);
+		if (P1 == 0 || P1 >= buffersize)break;
+	}
+	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	Playing = FALSE;
+}
+
+ void DSPlayer::PlayThreadCaller(LPVOID ThisPtr)
+{
+	((DSPlayer*)ThisPtr)->PlayThread();
+}
+
+void DSPlayer::Replay()
+{
+	if (!EnableLevel) return;
+	while (ThreadWait);
+	ThreadWait = TRUE;
+	uintptr_t th = _beginthread(PlayThreadCaller, 0, this);
+	if (!th) {
+		ThreadWait = FALSE;
+	}
+	while (ThreadWait);
+}
+
+void DSPlayer::Play(DmspSound s)
+{
+	if (!EnableLevel) return;
+	while (ThreadWait);
+	Sound = s;
+	ThreadWait = TRUE;
+	uintptr_t th= _beginthread(PlayThreadCaller, 0, this);
+	if (!th) {
+		ThreadWait = FALSE;
+	}
+	while (ThreadWait);
+}
+
+void DSPlayer::Stop()
+{
+	if (!EnableLevel) return;
+	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	Playing = FALSE;
+}
+
+void DSPlayer::Pause()
+{
+	if (!EnableLevel) return;
+	DSBuffer->SetCurrentPosition(0);
+	Playing = FALSE;
+}
+
+void DSPlayer::Continue()
+{
+	if (!EnableLevel) return;
+	DWORD P1, P2;
+	DWORD buffersize = min(DmspDesc.dwBufferBytes, Sound.size);
+	DSBuffer->GetCurrentPosition(&P1, &P2);
+	if (P1 == 0 || P1 >= buffersize) return;
+	DSBuffer->Play(0, 0, 0);
+	Playing = TRUE;
+}
+
+void DSBGMPlayer::PlayThread()
+{
+	DWORD P1, P2;
+	DWORD buffersize = DmspDesc.dwBufferBytes;
+	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	while (1)
+	{
+		if (ReadyForExit)
+		{
+			ReadyForExit = 2;
+			return;
+		}
+		if (MCStandBy[0].loop)
+		{
+			DSBuffer->Stop();
+			DSBuffer->SetCurrentPosition(0);
+			MCursor = MCStandBy[0].offset;
+			Sound = MCStandBy[1];
+			if (MCursor > Sound.size - 1)	MCursor = Sound.size - 1;
+			MCStandBy[0].loop = FALSE;
+		}
+		if (MCursor < 0 || !Sound.base || Sound.size <= 0)
+		{
+			DSBuffer->Stop();
+			DSBuffer->SetCurrentPosition(0);
+			Playing = FALSE;
+			Sleep(10);
+			continue;
+		}
+		Playing = TRUE;
+		if (MCursor + buffersize >= Sound.size)
+		{
+			while (1)
+			{
+				if (ReadyForExit)
+				{
+					ReadyForExit = 2;
+					return;
+				}
+				DSBuffer->GetCurrentPosition(&P1, &P2);
+				if (!P1)break;
+			}
+			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
+			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor,(Sound.size - MCursor>0)?(Sound.size - MCursor):0);
+			DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
+			DSBuffer->Play(0, 0, 0);
+			SafeSleep(INT32(UINT64(Sound.size - MCursor) * 1000 * BGMBufferSeconds / buffersize) - 50);
+			while (1)
+			{
+				if (ReadyForExit)
+				{
+					ReadyForExit = 2;
+					return;
+				}
+				DSBuffer->GetCurrentPosition(&P1, &P2);
+				if (P1 == 0 || P1 >= Sound.size - MCursor)break;
+			}
+			DSBuffer->Stop();
+			DSBuffer->SetCurrentPosition(0);
+			if (Sound.loop)
+			{
+				MCursor = 0;
+			}
+			else
+			{
+				MCursor = -1;
+				Playing = FALSE;
+			}
+		}
+		else
+		{
+			while (1)
+			{
+				if (ReadyForExit)
+				{
+					ReadyForExit = 2;
+					return;
+				}
+				DSBuffer->GetCurrentPosition(&P1, &P2);
+				if (!P1)break;
+			}
+			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
+			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor, buffersize);
+			DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
+			MCursor += buffersize;
+			DSBuffer->Play(0, 0, 0);
+			SafeSleep(INT32(BGMBufferSeconds) * 1000 - 50);
+		}
+	}
+
+}
+
+ void DSBGMPlayer::PlayThreadCaller(LPVOID ThisPtr)
+{
+	((DSBGMPlayer*)ThisPtr)->PlayThread();
+}
+
+
+
+void DSBGMPlayer::ChangeAndPlay(DmspSound s)
+{
+	if (!EnableLevel) return;
+	DSBuffer->Stop();
+	MCStandBy[1] = s;
+	MCStandBy[0].offset = 0;		//cursor = 0  , not offset
+	MCStandBy[0].loop = TRUE;	//will change , not loop
+}
+
+void DSBGMPlayer::Stop()
+{
+	if (!EnableLevel) return;
+	DmspSound s;
+	memset(&s, 0, sizeof(DmspSound));
+	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	MCStandBy[1] = s;
+	MCStandBy[0].loop = TRUE;	//will change , not loop
+	Playing = FALSE;
+}
+
+void DSBGMPlayer::Pause()
+{
+	if (!EnableLevel) return;
+	PauseBGM = Sound;
+	PauseCursor = MCursor;
+	MCStandBy[0].size = 1;	//pause
+	Stop();
+}
+
+void DSBGMPlayer::Continue()
+{
+	if (!EnableLevel) return;
+	if (MCStandBy[0].size == 0) return;
+
+	DSBuffer->Stop();
+	MCStandBy[1] = PauseBGM;
+	MCStandBy[0].offset = PauseCursor;		//cursor = 0  , not offset
+	MCStandBy[0].loop = TRUE;	//will change , not loop
+	MCStandBy[0].size = 0;	//continue
+	Playing = TRUE;
+}
+
+DSBGMPlayer::DSBGMPlayer(DSCreated * dsCreated, UINT32 BufferSeconds):DMSPlayer(dsCreated,BufferSeconds)
+{
+	if (!EnableLevel) return;
+	MCursor = 0;
+	memset(MCStandBy,0,2*sizeof(DmspSound));
+	memset(&PauseBGM, 0, sizeof(DmspSound));
+	PauseCursor = 0;
+	BGMBufferSeconds = BufferSeconds;
+	uintptr_t th = _beginthread(PlayThreadCaller, 0, this);
+	if (!th) {
+		EnableLevel = FALSE;
+		dsUsed->Release();
+	}
+	while (ThreadWait);
+}
+
+DSBGMPlayer::~DSBGMPlayer()
+{
+	if (EnableLevel)
+	{
+		Stop();
+		ReadyForExit = 1;
+		while (ReadyForExit != 2);
+	}
+}
