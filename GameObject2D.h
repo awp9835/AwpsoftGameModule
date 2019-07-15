@@ -40,6 +40,7 @@ class MovingGameObjectD2D1:public GameObjectD2D1
 {
 public:
 	FLOAT VelocityX,VelocityY,AccelerX, AccelerY, OmegaDEG, EpsilonDEG;
+	INT64 MoveTimeRemain;
 	MovingGameObjectD2D1();
 	~MovingGameObjectD2D1();
 	BOOL GiveTime_Moving(INT32 TimeGived);

@@ -44,7 +44,7 @@ DMSPlayer::DMSPlayer(DSCreated* dsCreated, UINT32 BufferSeconds)
 
 void DMSPlayer::SafeSleep(INT32 nms)
 {
-	INT32 t, m,i;
+	/*INT32 t, m,i;
 	if (nms < 0) nms = 0;
 	t = nms / 20;
 	m = nms % 20;
@@ -53,7 +53,8 @@ void DMSPlayer::SafeSleep(INT32 nms)
 		Sleep(20);
 		if (!Playing|ReadyForExit)return;
 	}
-	Sleep(m);
+	Sleep(m);*/
+	Sleep(100);
 }
 
 DMSPlayer::~DMSPlayer()

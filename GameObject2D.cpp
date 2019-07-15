@@ -121,6 +121,7 @@ MovingGameObjectD2D1::MovingGameObjectD2D1()
 	AccelerY = 0.0f;
 	OmegaDEG = 0.0f;
 	EpsilonDEG = 0.0f;
+	MoveTimeRemain = -1;
 }
 
 MovingGameObjectD2D1::~MovingGameObjectD2D1()
@@ -142,6 +143,7 @@ void MovingGameObjectD2D1::Reset_MovingGameObjectD2D1()
 	AccelerY = 0.0f;
 	OmegaDEG = 0.0f;
 	EpsilonDEG = 0.0f;
+	MoveTimeRemain = -1;
 }
 
 void MovingGameObjectD2D1::ResetGameObject2D()
@@ -152,6 +154,12 @@ void MovingGameObjectD2D1::ResetGameObject2D()
 BOOL MovingGameObjectD2D1::GiveTime_Moving(INT32 TimeGived)
 {
 	if (DisableTimeVariant||!Enable) return FALSE;
+	if (MoveTimeRemain == 0) return FALSE;
+	if (MoveTimeRemain > 0 && TimeGived > MoveTimeRemain)
+	{
+		TimeGived = MoveTimeRemain;
+	}
+	MoveTimeRemain -= TimeGived;
 	PosCenterX += VelocityX * TimeGived + AccelerX * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
 	PosCenterY += VelocityY * TimeGived + AccelerY * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
 	RotationDEG += OmegaDEG * TimeGived + EpsilonDEG * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
