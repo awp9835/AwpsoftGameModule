@@ -44,12 +44,12 @@ BOOL FunctionToKey::GetFunctionState(INT32 FunctionIndex)
 		return FALSE;
 	}
 	DWORD temp = KeysOfFunction[FunctionIndex];
-	if (GetKeyState(temp & 0xFF) < 0) return TRUE;
+	if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
 	temp >>= 8;
-	if (GetKeyState(temp & 0xFF) < 0) return TRUE;
+	if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
 	temp >>= 8;
-	if (GetKeyState(temp & 0xFF) < 0) return TRUE;
+	if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
 	temp >>= 8;
-	if (GetKeyState(temp & 0xFF) < 0) return TRUE;
+	if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
 	return FALSE;
 }
