@@ -77,14 +77,32 @@ SingleFontCollection * TextFormatFactory::CreateSingleFontCollection(IDWriteFont
 IDWriteTextFormat * TextFormatFactory::CreateTextFormat(const WCHAR * FontName, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight, DWRITE_FONT_STYLE FontStyle, DWRITE_FONT_STRETCH FontStretch)
 {
 	IDWriteTextFormat *pTextFormat = NULL;
-	pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight,FontStyle,FontStretch, FontSize, L"zh-cn",&pTextFormat);
+	HRESULT hr;
+	hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight,FontStyle,FontStretch, FontSize, L"zh-cn",&pTextFormat);
+	if (SUCCEEDED(hr))return pTextFormat;
+	hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, L"en-us", &pTextFormat);
+	if (SUCCEEDED(hr))return pTextFormat;
+	hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_INVARIANT, &pTextFormat);
+	if (SUCCEEDED(hr))return pTextFormat;
+	hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_USER_DEFAULT, &pTextFormat);
+	if (SUCCEEDED(hr))return pTextFormat;
+	hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_SYSTEM_DEFAULT, &pTextFormat);
 	return pTextFormat;
 }
 
 IDWriteTextFormat * TextFormatFactory::CreateTextFormat(SingleFontCollection * SingleFont, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight, DWRITE_FONT_STYLE FontStyle, DWRITE_FONT_STRETCH FontStretch)
 {
 		IDWriteTextFormat *pTextFormat = NULL;
-		pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, L"zh-cn", &pTextFormat);
+		HRESULT hr;
+		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, L"zh-cn", &pTextFormat);
+		if (SUCCEEDED(hr))return pTextFormat;
+		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, L"en-us", &pTextFormat);
+		if (SUCCEEDED(hr))return pTextFormat;
+		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_INVARIANT, &pTextFormat);
+		if (SUCCEEDED(hr))return pTextFormat;
+		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_USER_DEFAULT, &pTextFormat);
+		if (SUCCEEDED(hr))return pTextFormat;
+		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_SYSTEM_DEFAULT, &pTextFormat);
 		return pTextFormat;
 }
 
@@ -134,7 +152,7 @@ SingleFontCollection::SingleFontCollection(SingleFontCollectionLoader *Loader, I
 		pFontFamily->Release();
 		return;
 	}
-	pFamilyNames->GetString(0, FontName, 32);
+	pFamilyNames->GetString(0, FontName, 256);
 	pFamilyNames->Release();
 	pFontFamily->Release();
 }

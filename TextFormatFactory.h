@@ -24,7 +24,7 @@ class SingleFontCollection
 {
 private :
 	IDWriteFontCollection* FontCollection;
-	WCHAR FontName[32];
+	WCHAR FontName[256];
 public: 
 	SingleFontCollection(SingleFontCollectionLoader* Loader, IDWriteFactory  *pDWriteFactory);
 	~SingleFontCollection ();
