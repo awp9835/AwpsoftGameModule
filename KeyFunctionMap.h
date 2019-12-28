@@ -8,7 +8,7 @@ public:
 	FunctionToKey();
 	//Your Set At This
 
-	~FunctionToKey();
+	virtual ~FunctionToKey();
 	void SetKeysOfFunction(INT32 FunctionIndex, BYTE Key1, BYTE Key2 = 0x00, BYTE Key3 = 0x00, BYTE Key4 = 0x00);
 	DWORD GetKeysOfFunction(INT32 FunctionIndex);
 	BOOL GetFunctionState(INT32 FunctionIndex);

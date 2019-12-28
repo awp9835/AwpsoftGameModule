@@ -22,6 +22,9 @@ TimeVariantObject::TimeVariantObject()
 	DisableTimeVariant = FALSE;
 	TimeRemain = 0;
 }
+TimeVariantObject::~TimeVariantObject()
+{
+}
 inline void TimeVariantObject::ClearTimeRemain()
 {
 	TimeRemain = 0;

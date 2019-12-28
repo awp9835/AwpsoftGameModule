@@ -9,7 +9,7 @@ protected:
 	virtual BOOL Vacancy();
 public:
 	FastSchedule(UINT32 Len);
-	~FastSchedule();
+	virtual ~FastSchedule();
 	T **GetScheduleList();
 	UINT32 GetLength();
 	T* GotoNextField();

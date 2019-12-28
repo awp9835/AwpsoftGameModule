@@ -10,14 +10,14 @@
 #pragma comment  (lib, "d2d1")
 using namespace D2D1;
 
-class GameObject2D:public TimeVariantObject,public DoubleThreadLock
+class GameObject2D:public TimeVariantObject
 {	
 public:
 	FLOAT PosCenterX,PosCenterY,PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
 	volatile std::atomic<BYTE> Enable, Visible, WillDestory, ExistLifeTime;
 	volatile std::atomic<INT64> LifeTime;
 	GameObject2D();
-	~GameObject2D();
+	virtual ~GameObject2D();
 	BOOL GiveTime_ReduceLifeTime(INT32 TimeGived);
 	virtual BOOL GiveTime(INT32 TimeGived);
 	void Reset_GameObject2D();
@@ -29,7 +29,7 @@ protected:
 	volatile std::atomic<ID2D1Bitmap*> Image;//必须用对应的RenderTarget绘制
 public:
 	GameObjectD2D1();
-	~GameObjectD2D1();
+	virtual ~GameObjectD2D1();
 	void SetImage(ID2D1Bitmap* img);
 	virtual DrawParametersD2D1 GetDrawParameters();  
 	virtual void Draw(D2D1DrawFactory *DrawFactory);
@@ -42,7 +42,7 @@ public:
 	FLOAT VelocityX,VelocityY,AccelerX, AccelerY, OmegaDEG, EpsilonDEG;
 	INT64 MoveTimeRemain;
 	MovingGameObjectD2D1();
-	~MovingGameObjectD2D1();
+	virtual ~MovingGameObjectD2D1();
 	BOOL GiveTime_Moving(INT32 TimeGived);
 	virtual BOOL GiveTime(INT32 TimeGived);
 	void Reset_MovingGameObjectD2D1();
@@ -52,7 +52,7 @@ class TextBoxD2D1 :public MovingGameObjectD2D1
 {
 public:
 	TextBoxD2D1();
-	~TextBoxD2D1();
+	virtual ~TextBoxD2D1();
 	FLOAT TextLeftX, TextRightX ,TextTopY, TypedLength,TypeSpeed;
 	D2D_COLOR_F ColorF;
 	BYTE SuperAlpha, SuperTrasnform, SuperRelativePos,TypeMode;

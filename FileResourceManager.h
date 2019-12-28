@@ -29,7 +29,7 @@ private:
 	UINT32 ArrayLength;
 public:
 	FileResourceManager(UINT32 MaxFileCount = 0x1000);
-	~FileResourceManager();
+	virtual ~FileResourceManager();
 	BOOL TakeOverFileResource(FileResourceParameters FRI);
 	FileResourceParameters GetFileResourceParameters(UINT32 FileID);
 	UINT32 LoadFile(const WCHAR* FileName, UINT32 FileID, DWORD FileType,FLOAT Para1=0.0f,FLOAT Para2=0.0f);//return fsize,failed:0

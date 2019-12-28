@@ -41,7 +41,8 @@ public:
 	SingleFontCollection* CreateSingleFontCollection(IDWriteFontFile *FontFile);
 	IDWriteTextFormat* CreateTextFormat(const WCHAR* SystemFontName, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight = DWRITE_FONT_WEIGHT_NORMAL,DWRITE_FONT_STYLE FontStyle = DWRITE_FONT_STYLE_NORMAL,DWRITE_FONT_STRETCH  FontStretch = DWRITE_FONT_STRETCH_NORMAL);
 	IDWriteTextFormat* CreateTextFormat(SingleFontCollection* SingleFont, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight = DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE FontStyle = DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH  FontStretch = DWRITE_FONT_STRETCH_NORMAL);
+	IDWriteFactory* GetWriteFactory();
 	TextFormatFactory();
-	~TextFormatFactory();
+	virtual ~TextFormatFactory();
 };
 

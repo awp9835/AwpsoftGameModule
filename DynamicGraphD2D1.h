@@ -15,7 +15,7 @@ protected:
 public:
 	DynamicGraphs();
 	DynamicGraphs(ImagesClipD2D1 Clip);
-	~DynamicGraphs();
+	virtual ~DynamicGraphs();
 	void SetThisClip(ImagesClipD2D1 Clip);
 	void SetSwitchPara(FLOAT Speed,BOOL EnableReplay);
 	void SetSwitchSpeed(FLOAT Speed);

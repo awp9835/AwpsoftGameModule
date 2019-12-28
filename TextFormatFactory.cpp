@@ -106,6 +106,11 @@ IDWriteTextFormat * TextFormatFactory::CreateTextFormat(SingleFontCollection * S
 		return pTextFormat;
 }
 
+IDWriteFactory * TextFormatFactory::GetWriteFactory()
+{
+	return pDWriteFactory;
+}
+
 TextFormatFactory::TextFormatFactory()
 {	
 	pDWriteFactory = NULL;

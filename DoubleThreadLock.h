@@ -7,6 +7,7 @@ private:
 	volatile std::atomic<WORD> __Lock1, __Lock2,__RL1,__RL2;
 public:
 	DoubleThreadLock();
+	virtual ~DoubleThreadLock();
 	void Lock1();
 	void Lock2();
 	void Unlock1();

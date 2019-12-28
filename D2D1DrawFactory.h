@@ -40,7 +40,7 @@ protected:
 	D2D1Created(HWND hwnd);
 	~D2D1Created();
 }; 
-class D2D1DrawFactory :private D2D1Created
+class D2D1DrawFactory :protected D2D1Created
 {
 
 protected:
@@ -49,11 +49,12 @@ protected:
 	IWICImagingFactory *pIFactory;
 public:
 	D2D1DrawFactory(HWND hwnd, UINT32 Width = 1280, UINT32 Height = 720);
-	~D2D1DrawFactory();
+	virtual ~D2D1DrawFactory();
 	void DrawStep(DrawParametersD2D1 drawPara);
 	void DrawTextStep(TextParametersD2D1 TextPara, BOOL ResetTransForm);
 	void BeginDraw();
 	BOOL EndDraw();
+	ID2D1HwndRenderTarget *GetRenderTarget();
 	ID2D1Bitmap* CreateImageFromMemoryBMP(LPBYTE Buffer,UINT32 FSize);	
 	ID2D1Bitmap* CreateImageFromMemoryJPG(LPBYTE Buffer, UINT32 FSize);
 	ID2D1Bitmap* CreateImageFromMemoryPNG(LPBYTE Buffer, UINT32 FSize);

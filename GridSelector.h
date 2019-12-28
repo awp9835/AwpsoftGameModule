@@ -23,7 +23,7 @@ protected:
 	UINT Flatten(USHORT Index, USHORT SecondaryIndex);
 public :
 	GridSelector(SelectorMenuStyle Style, USHORT Sorts, USHORT SecondarySorts = 1);
-	~GridSelector();
+	virtual ~GridSelector();
 	// Valid:&0xF0000000 Unlock:&&0x0F000000 Value:&0x00FFFFFF
 	void SetUnitAttribute(DWORD Attribute, USHORT Index, USHORT SecondaryIndex = 0);
 	void SetCurrentAttribute(DWORD Attribute);

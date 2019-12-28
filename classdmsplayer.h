@@ -48,7 +48,7 @@ protected:
 public:
 
 	static const UINT32 nAvgBytesPerSecond = 176400;
-	~DMSPlayer();
+	virtual ~DMSPlayer();
 	void SetVolume(INT32 Volume);
 	INT32 GetVolume();
 	BOOL isEnable();//if created successful
@@ -56,7 +56,7 @@ public:
 };
 class DSPlayer : public DMSPlayer
 {
-private:
+protected:
 	void PlayThread();
 	static void PlayThreadCaller(LPVOID ThisPtr);
 public:
@@ -66,11 +66,11 @@ public:
 	void Pause();
 	void Continue();
 	DSPlayer(DSCreated* dsCreated, UINT32 MaximumSeconds = 10);
-	~DSPlayer();
+	virtual ~DSPlayer();
 };
 class DSBGMPlayer : public DMSPlayer
 {
-private:
+protected:
 	volatile std::atomic<INT32> MCursor;
 	DmspSound MCStandBy[2];
 	volatile std::atomic<INT32> PauseCursor;
@@ -84,6 +84,6 @@ public:
 	void Pause();	//NOT immediately
 	void Continue();	//NOT immediately
 	DSBGMPlayer(DSCreated* dsCreated, UINT32 BufferSeconds = 1);
-	~DSBGMPlayer();
+	virtual ~DSBGMPlayer();
 };
 

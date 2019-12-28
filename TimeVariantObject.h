@@ -7,6 +7,7 @@ public:
 	volatile std::atomic<INT64> TimeRemain;
 	volatile std::atomic<BOOL> DisableTimeVariant;
 	TimeVariantObject();
+	virtual ~TimeVariantObject();
 	void ClearTimeRemain();
 	virtual BOOL GiveTime(INT32 TimeGived);
 protected:

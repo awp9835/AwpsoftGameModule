@@ -99,6 +99,11 @@ BOOL D2D1DrawFactory::EndDraw()
 	return FALSE;
 }
 
+ID2D1HwndRenderTarget * D2D1DrawFactory::GetRenderTarget()
+{
+	return pRenderTarget;
+}
+
 
 
 

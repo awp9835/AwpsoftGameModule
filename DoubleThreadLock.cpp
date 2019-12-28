@@ -5,6 +5,8 @@ DoubleThreadLock::DoubleThreadLock()
 	__Lock1 = __Lock2 = __RL1 = __RL2 = FALSE;
 }
 
+DoubleThreadLock::~DoubleThreadLock() {}
+
 void DoubleThreadLock::Lock1()
 {
 	__RL1 = TRUE;
