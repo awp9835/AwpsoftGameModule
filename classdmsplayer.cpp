@@ -278,13 +278,15 @@ void DSBGMPlayer::PlayThread()
 		if (ReadyForExit)
 		{
 			ReadyForExit = 2;
+			ActivedBuffer = NULL;
 			return;
 		}
-		if (MCStandBy[0].loop)
+		if (MCStandBy[0].loop) //change
 		{
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
 			MCursor = MCStandBy[0].offset;
+			ActivedBuffer = MCStandBy[1].base;
 			Sound = MCStandBy[1];
 			if (MCursor > Sound.size - 1)	MCursor = Sound.size - 1;
 			MCStandBy[0].loop = FALSE;
@@ -294,6 +296,7 @@ void DSBGMPlayer::PlayThread()
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
 			Playing = FALSE;
+			ActivedBuffer = NULL;
 			Sleep(10);
 			continue;
 		}
@@ -327,14 +330,16 @@ void DSBGMPlayer::PlayThread()
 			}
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
-			if (Sound.loop)
+			if (Sound.loop > -1)
 			{
-				MCursor = 0;
+				MCursor = Sound.loop;
+				if (MCursor > Sound.size - 1)	MCursor = Sound.size - 1;
 			}
 			else
 			{
 				MCursor = -1;
 				Playing = FALSE;
+				ActivedBuffer = NULL;
 			}
 		}
 		else
@@ -367,13 +372,23 @@ void DSBGMPlayer::PlayThread()
 
 
 
-void DSBGMPlayer::ChangeAndPlay(DmspSound s)
+ BOOL DSBGMPlayer::IsSourceBufferSafeToRelease(BYTE * Base) 
+ { 
+	 return !(
+		 Base == ActivedBuffer
+		 || Base == PauseBGM.base
+		 ); 
+ }
+
+ void DSBGMPlayer::ChangeAndPlay(DmspSound s)
 {
 	if (!EnableLevel) return;
 	DSBuffer->Stop();
 	MCStandBy[1] = s;
 	MCStandBy[0].offset = 0;		//cursor = 0  , not offset
-	MCStandBy[0].loop = TRUE;	//will change , not loop
+	MCStandBy[0].loop = 1;	//will change , not loop
+	MCStandBy[0].size = FALSE; //cancel paused
+	memset(&PauseBGM, 0, sizeof(DmspSound));
 }
 
 void DSBGMPlayer::Stop()
@@ -384,7 +399,9 @@ void DSBGMPlayer::Stop()
 	DSBuffer->Stop();
 	DSBuffer->SetCurrentPosition(0);
 	MCStandBy[1] = s;
-	MCStandBy[0].loop = TRUE;	//will change , not loop
+	MCStandBy[0].loop = 1;	//will change , not loop
+	MCStandBy[0].size = FALSE;//cancel paused
+	memset(&PauseBGM, 0, sizeof(DmspSound));
 	Playing = FALSE;
 }
 
@@ -403,9 +420,11 @@ void DSBGMPlayer::Continue()
 	if (MCStandBy[0].size == 0) return;
 
 	DSBuffer->Stop();
+	if(PauseBGM.base) ActivedBuffer = PauseBGM.base; 
 	MCStandBy[1] = PauseBGM;
+	memset(&PauseBGM, 0, sizeof(DmspSound));
 	MCStandBy[0].offset = PauseCursor;		//cursor = 0  , not offset
-	MCStandBy[0].loop = TRUE;	//will change , not loop
+	MCStandBy[0].loop = 1;	//will change , not loop
 	MCStandBy[0].size = 0;	//continue
 	Playing = TRUE;
 }
@@ -418,6 +437,7 @@ DSBGMPlayer::DSBGMPlayer(DSCreated * dsCreated, UINT32 BufferSeconds):DMSPlayer(
 	memset(&PauseBGM, 0, sizeof(DmspSound));
 	PauseCursor = 0;
 	BGMBufferSeconds = BufferSeconds;
+	ActivedBuffer = NULL;
 	uintptr_t th = _beginthread(PlayThreadCaller, 0, this);
 	if (!th) {
 		EnableLevel = FALSE;

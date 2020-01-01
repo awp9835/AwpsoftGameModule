@@ -16,9 +16,9 @@ public:
 	virtual ULONG STDMETHODCALLTYPE Release(void); //Auto Destory in Unregister.
 	virtual ULONG STDMETHODCALLTYPE AddRef(void);
 	virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject);
-	virtual HRESULT CreateEnumeratorFromKey(IDWriteFactory *factory, void const *collectionKey, UINT32 collectionKeySize, IDWriteFontFileEnumerator **fontFileEnumerator);
-	virtual HRESULT GetCurrentFontFile(IDWriteFontFile **fFile);
-	virtual HRESULT MoveNext(BOOL *hasCurrentFile);
+	virtual HRESULT STDMETHODCALLTYPE CreateEnumeratorFromKey(IDWriteFactory *factory, void const *collectionKey, UINT32 collectionKeySize, IDWriteFontFileEnumerator **fontFileEnumerator);
+	virtual HRESULT STDMETHODCALLTYPE GetCurrentFontFile(IDWriteFontFile **fFile);
+	virtual HRESULT STDMETHODCALLTYPE MoveNext(BOOL *hasCurrentFile);
 };
 class SingleFontCollection
 {

@@ -44,10 +44,34 @@ BOOL FileResourceManager::TakeOverFileResource(FileResourceParameters FRI)
 	return TRUE;
 }
 
-FileResourceParameters FileResourceManager::GetFileResourceParameters(UINT32 Index)
+FileResourceParameters FileResourceManager::GetFileResourceParameters(UINT32 FileID)
 {
-	Index = min(Index, ArrayLength - 1);
-	return FileList[Index];
+	if (FileID >= ArrayLength)
+	{
+		FileResourceParameters temp;
+		memset(&temp, 0, sizeof(FileResourceParameters));
+		return temp;
+	}
+	else
+	{
+		return FileList[FileID];
+	}
+	
+}
+
+FileResourceParameters FileResourceManager::TakeOutFileBuffer(UINT32 FileID)
+{
+	FileResourceParameters temp;
+	if (FileID >= ArrayLength)
+	{
+		memset(&temp, 0, sizeof(FileResourceParameters));
+	}
+	else
+	{
+		temp = FileList[FileID];
+		memset(&FileList[FileID], 0, sizeof(FileResourceParameters));
+	}
+	return temp;
 }
 
 UINT32 FileResourceManager::LoadFile(const WCHAR * FileName, UINT32 FileID,DWORD FileType, FLOAT Para1, FLOAT Para2)
@@ -167,6 +191,138 @@ UINT64 FileResourceManager::LoadFilesFromPackage(const WCHAR * PackageFileName)
 	}
 	fclose(fp);
 	return (((UINT64)fcnt)<<32)|scnt;
+}
+
+UINT64 FileResourceManager::LoadRangeFilesFromPackage(const WCHAR * PackageFileName, UINT32 MinFileID, UINT32 MaxFileID)
+{
+	UINT32 scnt = 0, fcnt = 0;
+	INT64 fsize = 0, i = 0, tsize = 0;
+	FileResourceParameters frp;
+	FILE* fp;
+	fp = _wfopen(PackageFileName, L"rb");
+	if (!fp) return 0;
+	fseek(fp, 0, SEEK_END);
+	fsize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	fread(&frp.Type, 4, 1, fp);
+	if (frp.Type != 0x50464741)
+	{
+		fclose(fp);
+		return 0;
+	}
+	fsize -= 4;
+	while (fsize > 0)
+	{
+		fread(&frp.Index, sizeof(frp.Index), 1, fp);
+		fread(&frp.Type, sizeof(frp.Type), 1, fp);
+		fread(&frp.P1, sizeof(frp.P1), 1, fp);
+		fread(&frp.P2, sizeof(frp.P2), 1, fp);
+		fread(&frp.Size, sizeof(frp.Size), 1, fp);
+		fsize -= sizeof(frp.Index) + sizeof(frp.Type) + sizeof(frp.P1) + sizeof(frp.P2) + sizeof(frp.Size);
+		if (frp.Index < MinFileID || frp.Index > MaxFileID)
+		{
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+		if (frp.Index >= ArrayLength)
+		{
+			fcnt++;
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+		if (frp.Size > fsize)
+		{
+			fcnt++;
+			break;
+		}
+		try
+		{
+			frp.Buffer = new BYTE[frp.Size];
+			fread(frp.Buffer, 1, frp.Size, fp);
+			fsize -= frp.Size;
+			TakeOverFileResource(frp);
+			scnt++;
+			tsize += frp.Size;
+		}
+		catch (std::bad_alloc&)
+		{
+			fcnt++;
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+	}
+	fclose(fp);
+	return (((UINT64)fcnt) << 32) | scnt;
+}
+
+UINT64 FileResourceManager::LoadSingleFileFromPackage(const WCHAR * PackageFileName, UINT32 FileID)
+{
+	UINT32 scnt = 0, fcnt = 0;
+	INT64 fsize = 0, i = 0, tsize = 0;
+	FileResourceParameters frp;
+	FILE* fp;
+	if (FileID >= ArrayLength) return 0;
+	fp = _wfopen(PackageFileName, L"rb");
+	if (!fp) return 0;
+	fseek(fp, 0, SEEK_END);
+	fsize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	fread(&frp.Type, 4, 1, fp);
+	if (frp.Type != 0x50464741)
+	{
+		fclose(fp);
+		return 0;
+	}
+	fsize -= 4;
+	while (fsize > 0)
+	{
+		fread(&frp.Index, sizeof(frp.Index), 1, fp);
+		fread(&frp.Type, sizeof(frp.Type), 1, fp);
+		fread(&frp.P1, sizeof(frp.P1), 1, fp);
+		fread(&frp.P2, sizeof(frp.P2), 1, fp);
+		fread(&frp.Size, sizeof(frp.Size), 1, fp);
+		fsize -= sizeof(frp.Index) + sizeof(frp.Type) + sizeof(frp.P1) + sizeof(frp.P2) + sizeof(frp.Size);
+		if (frp.Index != FileID)
+		{
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+		if (frp.Index >= ArrayLength)
+		{
+			fcnt++;
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+		if (frp.Size > fsize)
+		{
+			fcnt++;
+			break;
+		}
+		try
+		{
+			frp.Buffer = new BYTE[frp.Size];
+			fread(frp.Buffer, 1, frp.Size, fp);
+			fsize -= frp.Size;
+			TakeOverFileResource(frp);
+			scnt++;
+			tsize += frp.Size;
+		}
+		catch (std::bad_alloc&)
+		{
+			fcnt++;
+			fsize -= frp.Size;
+			fseek(fp, frp.Size, SEEK_CUR);
+			continue;
+		}
+		break;
+	}
+	fclose(fp);
+	return (((UINT64)fcnt) << 32) | scnt;
 }
 
 UINT64 FileResourceManager::MakePackageFromCSV(const WCHAR * ManifestFileName, const WCHAR* TargetPackageName)

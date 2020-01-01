@@ -18,7 +18,7 @@ public:
 	void SetCurrentPos(UINT32 In);
 	virtual void ClearCurrentField();
 	void ClearAllField();
-	virtual UINT32 TackOverObject(T* pObject);
+	virtual UINT32 TakeOverObject(T* pObject);
 	void SaveCurrentPos();
 	void LoadSavedPos();
 };
@@ -140,7 +140,7 @@ inline void FastSchedule<T>::ClearAllField()
 }
 
 template<class T>
-inline UINT32 FastSchedule<T>::TackOverObject(T * pObject)
+inline UINT32 FastSchedule<T>::TakeOverObject(T * pObject)
 {
 
 	if (GotoNextVacancy() == 0xFFFFFFFF)

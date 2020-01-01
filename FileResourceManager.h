@@ -32,10 +32,13 @@ public:
 	virtual ~FileResourceManager();
 	BOOL TakeOverFileResource(FileResourceParameters FRI);
 	FileResourceParameters GetFileResourceParameters(UINT32 FileID);
+	FileResourceParameters TakeOutFileBuffer(UINT32 FileID);
 	UINT32 LoadFile(const WCHAR* FileName, UINT32 FileID, DWORD FileType,FLOAT Para1=0.0f,FLOAT Para2=0.0f);//return fsize,failed:0
 	UINT32 ReleaseFileResource(UINT32 FileID);
 	UINT64 ReleaseAllFileResource();
 	UINT64 LoadFilesFromPackage(const WCHAR* PackageFileName);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
+	UINT64 LoadRangeFilesFromPackage(const WCHAR* PackageFileName, UINT32 MinFileID = 0,UINT32 MaxFileID = 0x7FFFFFFF);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
+	UINT64 LoadSingleFileFromPackage(const WCHAR* PackageFileName,UINT32 FileID);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
 	static UINT64 MakePackageFromCSV(const WCHAR* ManifestFileName,const WCHAR* TargetPackageName);//成功数:Low 32 Bits，失败数:High 32 Bits
 };
 

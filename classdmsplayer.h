@@ -12,7 +12,7 @@ struct DmspSound
 	LPBYTE base;
 	INT32 offset;
 	INT32 size;	
-	BOOL loop; //Enable in DSBGMPlayer,Disable in DSPlayer
+	INT32 loop; //Enable only DSBGMPlayer,2nd offset of loop,adress:base + offset + loop ;-1 is not loop
 };
 class DSCreated
 {
@@ -78,7 +78,9 @@ protected:
 	DWORD BGMBufferSeconds;
 	void PlayThread();
 	static void PlayThreadCaller(LPVOID ThisPtr);
+	volatile std::atomic<BYTE*> ActivedBuffer;
 public:
+	BOOL IsSourceBufferSafeToRelease(BYTE* Base);;
 	void ChangeAndPlay(DmspSound s); //Replace and play NOT immediately 
 	void Stop();	//NOT immediately
 	void Pause();	//NOT immediately
