@@ -411,7 +411,14 @@ void DSBGMPlayer::Pause()
 	PauseBGM = Sound;
 	PauseCursor = MCursor;
 	MCStandBy[0].size = 1;	//pause
-	Stop();
+	DmspSound s;
+	memset(&s, 0, sizeof(DmspSound));
+	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	MCStandBy[1] = s;
+	MCStandBy[0].loop = 1;	//will change , not loop
+	MCStandBy[0].size = FALSE;//cancel paused
+	Playing = FALSE;
 }
 
 void DSBGMPlayer::Continue()
