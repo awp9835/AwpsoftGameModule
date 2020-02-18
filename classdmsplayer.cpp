@@ -179,8 +179,9 @@ void DSPlayer::PlayThread()
 		ThreadWait = FALSE;
 		return;
 	}
-	DSBuffer->SetCurrentPosition(0);
 	DSBuffer->Stop();
+	DSBuffer->SetCurrentPosition(0);
+	
 	DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
 	if (Sound.size < INT32(DmspDesc.dwBufferBytes))
 	{
