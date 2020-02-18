@@ -54,7 +54,7 @@ void DMSPlayer::SafeSleep(INT32 nms)
 		if (!Playing|ReadyForExit)return;
 	}
 	Sleep(m);*/
-	Sleep(100);
+	Sleep(7);
 }
 
 DMSPlayer::~DMSPlayer()
@@ -293,14 +293,17 @@ void DSBGMPlayer::PlayThread()
 					ReadyForExit = 2;
 					return;
 				}
-				DSBuffer->GetCurrentPosition(&P1, &P2);
-				if (!P1)break;
+				//DSBuffer->GetCurrentPosition(&P1, &P2);
+				DWORD st;
+				DSBuffer->GetStatus(&st);
+				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING)) break;
+				if(!(st & DSBSTATUS_PLAYING)) break;
+				Sleep(7);
 			}
 			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
 			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor,(Sound.size - MCursor>0)?(Sound.size - MCursor):0);
 			DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
 			DSBuffer->Play(0, 0, 0);
-			SafeSleep(INT32(UINT64(Sound.size - MCursor) * 1000 * BGMBufferSeconds / buffersize) - 50);
 			while (1)
 			{
 				if (ReadyForExit)
@@ -309,7 +312,11 @@ void DSBGMPlayer::PlayThread()
 					return;
 				}
 				DSBuffer->GetCurrentPosition(&P1, &P2);
-				if (P1 == 0 || INT32(P1) >= Sound.size - MCursor)break;
+				DWORD st;
+				DSBuffer->GetStatus(&st);
+				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING) || INT32(P1) >= Sound.size - MCursor) break;
+				if (!(st & DSBSTATUS_PLAYING) || INT32(P1) >= Sound.size - MCursor) break;
+				Sleep(7);
 			}
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
@@ -334,15 +341,18 @@ void DSBGMPlayer::PlayThread()
 					ReadyForExit = 2;
 					return;
 				}
-				DSBuffer->GetCurrentPosition(&P1, &P2);
-				if (!P1)break;
+				//DSBuffer->GetCurrentPosition(&P1, &P2);
+				DWORD st;
+				DSBuffer->GetStatus(&st);
+				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING)) break;
+				if (!(st & DSBSTATUS_PLAYING)) break;
+				Sleep(7);
 			}
 			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
 			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor, buffersize);
 			DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
 			MCursor += buffersize;
 			DSBuffer->Play(0, 0, 0);
-			SafeSleep(INT32(BGMBufferSeconds) * 1000 - 50);
 		}
 	}
 
