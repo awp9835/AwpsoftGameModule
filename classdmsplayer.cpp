@@ -73,7 +73,7 @@ void DMSPlayer::SetVolume(INT32 Volume)
 	if (!EnableLevel) return;
 	if (Volume > 100) Volume = 100;
 	if (Volume < 0) Volume = 0;
-	Volume = 10000 * pow(Volume / 100.0, 0.17);
+	Volume = INT32(10000 * pow(Volume / 100.0, 0.17));
 	if (Volume > 10000) Volume = 10000;
 	if (Volume < 0) Volume = 0;
 	DSBuffer->SetVolume(-10000 + Volume);
@@ -85,7 +85,7 @@ INT32 DMSPlayer::GetVolume()
 	if (!EnableLevel) return -1;
 	DSBuffer->GetVolume(&Volume);
 	Volume = (10000 + Volume);
-	Volume = 100 * pow(Volume / 10000.0, 1.0 / 0.17) + 0.5;
+	Volume = INT32(100 * pow(Volume / 10000.0, 1.0 / 0.17) + 0.5);
 	if (Volume > 100) Volume = 100;
 	if (Volume < 0) Volume = 0;
 	return Volume;
@@ -167,22 +167,12 @@ DSPlayer::~DSPlayer()
 	{
 		DSBuffer->Stop();
 		DSBuffer->SetCurrentPosition(0);
-		ReadyForExit = 1;
-		while (ReadyForExit != 2 && Playing);
 	}
 	
 }
 
 void DSPlayer::PlayThread()
 {
-	DWORD P1, P2;
-	DWORD buffersize = min(DmspDesc.dwBufferBytes, Sound.size);
-	Playing = TRUE;
-	if (ReadyForExit) 
-	{ 
-		ReadyForExit = 2;
-		return; 
-	}
 	if (!Sound.base || Sound.size <= 0)
 	{
 		Playing = FALSE;
@@ -190,25 +180,20 @@ void DSPlayer::PlayThread()
 		return;
 	}
 	DSBuffer->SetCurrentPosition(0);
-	DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
-	memcpy(pDestBuffer, Sound.base + Sound.offset, buffersize);
-	DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
-	ThreadWait = FALSE;
-	DSBuffer->Play(0, 0, 0);
-	SafeSleep(INT32(UINT64(buffersize) * 1000 /  nAvgBytesPerSecond) - 50);
-	while (1)
-	{
-		if (ReadyForExit)
-		{
-			ReadyForExit = 2;
-			return;
-		}
-		DSBuffer->GetCurrentPosition(&P1, &P2);
-		if (P1 == 0 || P1 >= buffersize)break;
-	}
 	DSBuffer->Stop();
-	DSBuffer->SetCurrentPosition(0);
-	Playing = FALSE;
+	DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
+	if (Sound.size < INT32(DmspDesc.dwBufferBytes))
+	{
+		memset((BYTE*)pDestBuffer + Sound.size, 0, DmspDesc.dwBufferBytes - Sound.size);
+		memcpy(pDestBuffer, Sound.base + Sound.offset, Sound.size);
+	}
+	else
+	{
+		memcpy(pDestBuffer, Sound.base + Sound.offset, DmspDesc.dwBufferBytes);
+	}
+	DSBuffer->Unlock(pDestBuffer, DmspDesc.dwBufferBytes, NULL, 0);
+	DSBuffer->Play(0, 0, 0);
+	ThreadWait = FALSE;
 }
 
  void DSPlayer::PlayThreadCaller(LPVOID ThisPtr)
@@ -246,25 +231,22 @@ void DSPlayer::Stop()
 	if (!EnableLevel) return;
 	DSBuffer->Stop();
 	DSBuffer->SetCurrentPosition(0);
-	Playing = FALSE;
 }
 
 void DSPlayer::Pause()
 {
 	if (!EnableLevel) return;
-	DSBuffer->SetCurrentPosition(0);
-	Playing = FALSE;
+	DSBuffer->Stop();
 }
 
 void DSPlayer::Continue()
 {
 	if (!EnableLevel) return;
 	DWORD P1, P2;
-	DWORD buffersize = min(DmspDesc.dwBufferBytes, Sound.size);
+	DWORD buffersize = min(INT32(DmspDesc.dwBufferBytes), Sound.size);
 	DSBuffer->GetCurrentPosition(&P1, &P2);
 	if (P1 == 0 || P1 >= buffersize) return;
 	DSBuffer->Play(0, 0, 0);
-	Playing = TRUE;
 }
 
 void DSBGMPlayer::PlayThread()
@@ -301,7 +283,7 @@ void DSBGMPlayer::PlayThread()
 			continue;
 		}
 		Playing = TRUE;
-		if (MCursor + buffersize >= Sound.size)
+		if (INT32(MCursor + buffersize) >= Sound.size)
 		{
 			while (1)
 			{
@@ -326,7 +308,7 @@ void DSBGMPlayer::PlayThread()
 					return;
 				}
 				DSBuffer->GetCurrentPosition(&P1, &P2);
-				if (P1 == 0 || P1 >= Sound.size - MCursor)break;
+				if (P1 == 0 || INT32(P1) >= Sound.size - MCursor)break;
 			}
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
