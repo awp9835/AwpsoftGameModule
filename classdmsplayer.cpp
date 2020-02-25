@@ -299,7 +299,7 @@ void DSBGMPlayer::PlayThread()
 				DSBuffer->GetStatus(&st);
 				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING)) break;
 				if(!(st & DSBSTATUS_PLAYING)) break;
-				Sleep(7);
+				Sleep(1);
 			}
 			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
 			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor,(Sound.size - MCursor>0)?(Sound.size - MCursor):0);
@@ -317,7 +317,7 @@ void DSBGMPlayer::PlayThread()
 				DSBuffer->GetStatus(&st);
 				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING) || INT32(P1) >= Sound.size - MCursor) break;
 				if (!(st & DSBSTATUS_PLAYING) || INT32(P1) >= Sound.size - MCursor) break;
-				Sleep(7);
+				Sleep(1);
 			}
 			DSBuffer->Stop();
 			DSBuffer->SetCurrentPosition(0);
@@ -347,7 +347,7 @@ void DSBGMPlayer::PlayThread()
 				DSBuffer->GetStatus(&st);
 				//if (P1 == 0 && !(st & DSBSTATUS_PLAYING)) break;
 				if (!(st & DSBSTATUS_PLAYING)) break;
-				Sleep(7);
+				Sleep(1);
 			}
 			DSBuffer->Lock(0, DmspDesc.dwBufferBytes, &pDestBuffer, &DmspDesc.dwBufferBytes, NULL, 0, DSBLOCK_ENTIREBUFFER);
 			memcpy(pDestBuffer, Sound.base + Sound.offset + MCursor, buffersize);
