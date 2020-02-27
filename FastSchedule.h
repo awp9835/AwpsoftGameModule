@@ -53,10 +53,10 @@ template<class T>
 inline FastSchedule<T>::~FastSchedule()
 {
 
-	if (!ScheduleList)
+	if (ScheduleList)
 	{
 		ClearAllField();
-		delete ScheduleList;
+		delete[] ScheduleList;
 	}
 	Length = 0;
 	ScheduleList = NULL;

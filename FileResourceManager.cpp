@@ -27,7 +27,7 @@ FileResourceManager::~FileResourceManager()
 	if (FileList)
 	{
 		ReleaseAllFileResource();
-		delete FileList;
+		delete[] FileList;
 	}
 	FileList = NULL;
 }
