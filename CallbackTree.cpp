@@ -1,10 +1,12 @@
 #include "CallbackTree.h"
-
-void StartCallbackTree(CallbackTreeFunction Root)
+namespace AwpSoftGameModule
 {
-	CallbackTreeFunction Next = Root;
-	while (Next)
+	void StartCallbackTree(CallbackTreeFunction Root)
 	{
-		Next = (CallbackTreeFunction)((*Next)());
+		CallbackTreeFunction Next = Root;
+		while (Next)
+		{
+			Next = (CallbackTreeFunction)((*Next)());
+		}
 	}
-}
+};

@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <cstdio>
 #include "CallbackTree.h"
-#include "ClassDmsplayer.h"
+#include "XAPlayer.h"
 #include "D2D1DrawFactory.h"
 #include "DoubleThreadLock.h"
 #include "DynamicGraphD2D1.h"
@@ -16,3 +16,7 @@
 #include "McsJudge.h"
 #include "TextFormatFactory.h"
 #include "TimeVariantObject.h"
+
+#ifndef _NOT_USING_NAMESPACE_AWPSOFT_GAME_MODULE
+using namespace AwpSoftGameModule;
+#endif

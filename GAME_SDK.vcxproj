@@ -125,7 +125,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CallbackTree.cpp" />
-    <ClCompile Include="ClassDmsplayer.cpp" />
+    <ClCompile Include="XAPlayer.cpp" />
     <ClCompile Include="D2D1DrawFactory.cpp" />
     <ClCompile Include="DoubleThreadLock.cpp" />
     <ClCompile Include="DynamicGraphD2D1.cpp" />
@@ -141,7 +141,7 @@
   <ItemGroup>
     <ClInclude Include="AwpSoftGameModule.h" />
     <ClInclude Include="CallbackTree.h" />
-    <ClInclude Include="ClassDmsplayer.h" />
+    <ClInclude Include="XAPlayer.h" />
     <ClInclude Include="D2D1DrawFactory.h" />
     <ClInclude Include="DoubleThreadLock.h" />
     <ClInclude Include="DynamicGraphD2D1.h" />

@@ -1,3 +1,6 @@
 #pragma once
-extern float MathListCosDEG(float thetaDEG);
-extern float MathListSinDEG(float thetaDEG);
+namespace AwpSoftGameModule
+{
+	extern float MathListCosDEG(float thetaDEG);
+	extern float MathListSinDEG(float thetaDEG);
+};

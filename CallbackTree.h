@@ -1,4 +1,7 @@
 #pragma once
 #include<Windows.h>
-typedef LPVOID(CALLBACK *CallbackTreeFunction)(void);
-extern void StartCallbackTree(CallbackTreeFunction Root);
+namespace AwpSoftGameModule
+{
+	typedef LPVOID(CALLBACK *CallbackTreeFunction)(void);
+	extern void StartCallbackTree(CallbackTreeFunction Root);
+};
