@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <cstdio>
 #include "CallbackTree.h"
-#include "XAPlayer.h"
+#include "XA2Player.h"
 #include "D2D1DrawFactory.h"
 #include "DoubleThreadLock.h"
 #include "DynamicGraphD2D1.h"
