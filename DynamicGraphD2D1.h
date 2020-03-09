@@ -9,7 +9,7 @@ class DynamicGraphs :TimeVariantObject
 {
 protected:
 	ImagesClipD2D1 ThisClip;
-	volatile  std::atomic<INT32> CurrentFrame;
+	INT32 CurrentFrame;
 	FLOAT SwitchSpeed,Remnant;
 	BOOL Loop;
 public:

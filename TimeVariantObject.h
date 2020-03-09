@@ -1,11 +1,10 @@
 #pragma once
 #include <windows.h>
-#include <atomic>
 class TimeVariantObject
 {
 public:
-	volatile std::atomic<INT64> TimeRemain;
-	volatile std::atomic<BOOL> DisableTimeVariant;
+	INT64 TimeRemain;
+	BOOL DisableTimeVariant;
 	TimeVariantObject();
 	virtual ~TimeVariantObject();
 	void ClearTimeRemain();
@@ -17,8 +16,8 @@ class TimerTrigger :public TimeVariantObject
 {
 
 public:
-	volatile std::atomic<BOOL> Ready;
-	volatile std::atomic<UINT32> Cycle;
+	BOOL Ready;
+	UINT32 Cycle;
 	TimerTrigger(INT32 TimerCycle = 1);
 	void ClearStates();
 	BOOL TryTriggerOnce();
@@ -27,9 +26,9 @@ public:
 class TimerClip :public TimeVariantObject
 {
 public:
-	volatile std::atomic<INT32> Charged;
-	volatile std::atomic<INT32> MaxCharge;
-	volatile std::atomic<UINT32> Cycle;
+	INT32 Charged;
+	INT32 MaxCharge;
+	UINT32 Cycle;
 	TimerClip(INT32 MaximumCharge = 1, INT32 TimerCycle = 1);
 	void ClearStates();
 	BOOL TryConsume(INT32 Count = 1);

@@ -4,7 +4,6 @@
 #include <dshow.h>
 #include "TimeVariantObject.h"
 #include "DoubleThreadLock.h"
-#include <atomic>
 #include "D2D1DrawFactory.h"
 #pragma comment  (lib,"Dxguid.lib")
 #pragma comment  (lib, "d2d1")
@@ -14,8 +13,8 @@ class GameObject2D:public TimeVariantObject
 {	
 public:
 	FLOAT PosCenterX,PosCenterY,PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
-	volatile std::atomic<BYTE> Enable, Visible, WillDestory, ExistLifeTime;
-	volatile std::atomic<INT64> LifeTime;
+	BYTE Enable, Visible, WillDestory, ExistLifeTime;
+	INT64 LifeTime;
 	GameObject2D();
 	virtual ~GameObject2D();
 	BOOL GiveTime_ReduceLifeTime(INT32 TimeGived);
@@ -26,7 +25,7 @@ public:
 class GameObjectD2D1:public GameObject2D
 {
 protected:
-	volatile std::atomic<ID2D1Bitmap*> Image;//必须用对应的RenderTarget绘制
+	ID2D1Bitmap* Image;//必须用对应的RenderTarget绘制
 public:
 	GameObjectD2D1();
 	virtual ~GameObjectD2D1();
