@@ -207,6 +207,14 @@ namespace AwpSoftGameModule
 			SourcePoster->FlushSourceBuffers();
 			return;
 		}
+		else if(!xa2Buffer->pAudioData)
+		{
+			memset(&LastBuffer, 0, sizeof(XAUDIO2_BUFFER));
+			SourcePoster->Stop();
+			SourcePoster->FlushSourceBuffers();
+			return;
+		}
+
 		if (resetIfNoChange) //默认强制重播
 		{
 			LastBuffer = *xa2Buffer;
