@@ -18,9 +18,6 @@
     <ClCompile Include="CallbackTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="classdmsplayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D2D1DrawFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -42,24 +39,24 @@
     <ClCompile Include="KeyFunctionMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mathlist.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mcsjudge.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextFormatFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TimeVariantObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClassDmsplayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="McsJudge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MathList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CallbackTree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="classdmsplayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D2D1DrawFactory.h">
@@ -86,16 +83,22 @@
     <ClInclude Include="KeyFunctionMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mathlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mcsjudge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextFormatFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TimeVariantObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AwpSoftGameModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="McsJudge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassDmsplayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <cstdio>
 #include "CallbackTree.h"
-#include "classdmsplayer.h"
+#include "ClassDmsplayer.h"
 #include "D2D1DrawFactory.h"
 #include "DoubleThreadLock.h"
 #include "DynamicGraphD2D1.h"
@@ -12,7 +12,7 @@
 #include "GameObject2D.h"
 #include "GridSelector.h"
 #include "KeyFunctionMap.h"
-#include "mathlist.h"
-#include "mcsjudge.h"
+#include "MathList.h"
+#include "McsJudge.h"
 #include "TextFormatFactory.h"
 #include "TimeVariantObject.h"
