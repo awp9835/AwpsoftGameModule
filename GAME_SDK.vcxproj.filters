@@ -51,7 +51,7 @@
     <ClCompile Include="MathList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XAPlayer.cpp">
+    <ClCompile Include="XA2Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,8 +98,11 @@
     <ClInclude Include="MathList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XAPlayer.h">
+    <ClInclude Include="XA2Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
