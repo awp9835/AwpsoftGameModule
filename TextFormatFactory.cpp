@@ -31,6 +31,18 @@ namespace AwpSoftGameModule
 
 	HRESULT __stdcall SingleFontCollectionLoader::QueryInterface(REFIID riid, void ** ppvObject)
 	{
+		if (riid == __uuidof(IDWriteFontCollectionLoader))
+		{
+			*ppvObject = (IDWriteFontCollectionLoader*)this;
+			AddRef();
+			return S_OK;
+		}
+		else if (riid == __uuidof(IDWriteFontFileEnumerator))
+		{
+			*ppvObject = (IDWriteFontFileEnumerator*)this;
+			AddRef();
+			return S_OK;
+		}
 		return E_FAIL;
 	}
 
