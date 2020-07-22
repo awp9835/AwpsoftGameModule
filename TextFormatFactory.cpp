@@ -87,13 +87,17 @@ namespace AwpSoftGameModule
 	SingleFontCollection* TextFormatFactory::CreateSingleFontCollection(const WCHAR * Path)
 	{
 		SingleFontCollectionLoader* Loader = new SingleFontCollectionLoader(pDWriteFactory, Path);
-		return new SingleFontCollection(Loader, pDWriteFactory);
+		SingleFontCollection* result = new SingleFontCollection(Loader, pDWriteFactory);
+		Loader->Release();
+		return result;
 	}
 
 	SingleFontCollection * TextFormatFactory::CreateSingleFontCollection(IDWriteFontFile * FontFile)
 	{
 		SingleFontCollectionLoader* Loader = new SingleFontCollectionLoader(FontFile);
-		return new SingleFontCollection(Loader, pDWriteFactory);
+		SingleFontCollection* result = new SingleFontCollection(Loader, pDWriteFactory);
+		Loader->Release();
+		return result;
 	}
 
 	IDWriteTextFormat * TextFormatFactory::CreateTextFormat(const WCHAR * FontName, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight, DWRITE_FONT_STYLE FontStyle, DWRITE_FONT_STRETCH FontStretch)
