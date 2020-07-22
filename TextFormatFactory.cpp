@@ -3,6 +3,7 @@ namespace AwpSoftGameModule
 {
 	SingleFontCollectionLoader::~SingleFontCollectionLoader()
 	{
+		if (FontFile) FontFile -> Release();
 	}
 
 	SingleFontCollectionLoader::SingleFontCollectionLoader(IDWriteFontFile * para)
@@ -57,6 +58,7 @@ namespace AwpSoftGameModule
 	{
 		*fFile = FontFile;
 		if (!FontFile) return E_FAIL;
+		FontFile->AddRef();
 		return S_OK;
 	}
 
