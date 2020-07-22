@@ -44,6 +44,12 @@ namespace AwpSoftGameModule
 			AddRef();
 			return S_OK;
 		}
+		else if (riid == __uuidof(IUnknown))
+		{
+			*ppvObject = (IUnknown*)(IDWriteFontCollectionLoader*)this;
+			AddRef();
+			return S_OK;
+		}
 		return E_FAIL;
 	}
 
