@@ -57,6 +57,7 @@ namespace AwpSoftGameModule
 	{
 		FirstMove = TRUE;
 		*fontFileEnumerator = this;
+		AddRef();
 		return S_OK;
 	}
 
