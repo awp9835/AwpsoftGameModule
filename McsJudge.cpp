@@ -1,4 +1,4 @@
-#include "mcsjudge.h"
+#include "McsJudge.h"
 
 namespace AwpSoftGameModule
 {

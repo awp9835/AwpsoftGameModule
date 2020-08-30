@@ -1,6 +1,6 @@
 #pragma once
 /*header*/
-#include "mathlist.h"
+#include "MathList.h"
 #include <windows.h>
 namespace AwpSoftGameModule
 {
