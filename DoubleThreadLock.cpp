@@ -17,6 +17,7 @@ namespace AwpSoftGameModule
 			if (__Lock1)
 			{
 				__Lock1 = FALSE;
+				Sleep(0);
 				__Lock1 = TRUE;
 			}
 		}
@@ -30,6 +31,7 @@ namespace AwpSoftGameModule
 			if (__Lock2)
 			{
 				__Lock2 = FALSE;
+				Sleep(0);
 				__Lock2 = TRUE;
 			}
 		}
