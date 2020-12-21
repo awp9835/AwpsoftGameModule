@@ -26,7 +26,7 @@ namespace AwpSoftGameModule
 	public:
 		GridSelector(SelectorMenuStyle Style, USHORT Sorts, USHORT SecondarySorts = 1);
 		virtual ~GridSelector();
-		// Valid:&0xF0000000 Disabled:&&0x0F000000 Value:&0x00FFFFFF
+		// Valid:&0xF0000000 Unlock:&&0x0F000000 Value:&0x00FFFFFF
 		void SetUnitAttribute(DWORD Attribute, USHORT Index, USHORT SecondaryIndex = 0);
 		void SetCurrentAttribute(DWORD Attribute);
 		DWORD GetUnitAttribute(USHORT Index, USHORT SecondaryIndex = 0);
