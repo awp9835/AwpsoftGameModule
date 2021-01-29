@@ -2,12 +2,12 @@
 #include <Windows.h>
 namespace AwpSoftGameModule
 {
-	INT64 TVOSafeModINT64(INT64 a, INT64 b)
+	long long TVOSafeModInt64(long long a, long long b)
 	{
 		if (b == 0) return 0;
 		return a % b;
 	}
-	INT64 TVOSafeDivINT64(INT64 a, INT64 b)
+	long long TVOSafeDivInt64(long long a, long long b)
 	{
 		if (b == 0)
 		{
@@ -20,138 +20,142 @@ namespace AwpSoftGameModule
 
 	TimeVariantObject::TimeVariantObject()
 	{
-		DisableTimeVariant = FALSE;
+		DisableTimeVariant = false;
+		TimeRemain = 0;
+	}
+	void TimeVariantObject::reset()
+	{
+		DisableTimeVariant = false;
 		TimeRemain = 0;
 	}
 	TimeVariantObject::~TimeVariantObject()
 	{
 	}
-	inline void TimeVariantObject::ClearTimeRemain()
+
+	void TimeVariantObject::clearTimeRemain()
 	{
 		TimeRemain = 0;
 	}
 
-	BOOL TimeVariantObject::GiveTime(INT32 TimeGived)
+	bool TimeVariantObject::giveTime(int timeGived)
 	{
-		GiveTime_Default(TimeGived);
-		return FALSE;
+		if (DisableTimeVariant) return false;
+		if (timeGived < 0) return false;
+		TimeRemain += timeGived;
+		return true;
 	}
 
-	BOOL TimeVariantObject::GiveTime_Default(INT32 TimeGived)
+	bool TimerTrigger::giveTime(int timeGived)
 	{
-		if (DisableTimeVariant) return FALSE;
-		if (TimeGived < 0) return FALSE;
-		if (TimeRemain + TimeGived < 0)
-		{
-			TimeRemain = MAXINT64;
-		}
-		else
-		{
-			TimeRemain += TimeGived;
-		}
-		return TRUE;
-	}
-
-	BOOL TimerTrigger::GiveTime(INT32 TimeGived)
-	{
-		if (!GiveTime_Default(TimeGived)) return FALSE;
+		if (!__super::giveTime(timeGived)) return false;
 		if (Cycle == 0)
 		{
 			TimeRemain = 0;
-			Ready = TRUE;
-			return TRUE;
+			Ready = true;
+			return true;
 		}
-		if (TimeRemain >= Cycle) {
-			TimeRemain = TVOSafeModINT64(TimeRemain, Cycle);
-			Ready = TRUE;
-			return TRUE;
+		if (TimeRemain >= Cycle) 
+		{
+			TimeRemain = TVOSafeModInt64(TimeRemain, Cycle);
+			Ready = true;
+			return true;
 		}
-		return FALSE;
+		return true;
 	}
 
-	TimerTrigger::TimerTrigger(INT32 TimerCycle)
+	TimerTrigger::TimerTrigger(int timerCycle)
 	{
-		if (TimerCycle < 0) TimerCycle = 0;
-		Cycle = TimerCycle;
-		Ready = FALSE;
+		if (timerCycle < 0) timerCycle = 0;
+		Cycle = timerCycle;
+		Ready = false;
 	}
 
-	void TimerTrigger::ClearStates()
+	void TimerTrigger::clearStates()
 	{
 		TimeRemain = 0;
 		Ready = 0;
 	}
 
-	BOOL TimerTrigger::TryTriggerOnce()
+	bool TimerTrigger::tryTriggerOnce()
 	{
 		if (Ready)
 		{
-			Ready = FALSE;
-			return TRUE;
+			Ready = false;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
-	TimerClip::TimerClip(INT32 MaximumCharge, INT32 TimerCycle)
+	void TimerTrigger::reset()
 	{
-		if (TimerCycle < 0) TimerCycle = 0;
-		if (MaximumCharge < 0) MaximumCharge = 0;
-		Cycle = TimerCycle;
-		MaxCharge = MaximumCharge;
+		clearStates();
+	}
+
+	TimerClip::TimerClip(int maximumCharge, int timerCycle)
+	{
+		if (timerCycle < 0) timerCycle = 0;
+		if (maximumCharge < 0) maximumCharge = 0;
+		Cycle = timerCycle;
+		MaxCharge = maximumCharge;
 		Charged = 0;
 	}
 
-	void TimerClip::ClearStates()
+	void TimerClip::clearStates()
 	{
 		TimeRemain = 0;
 		Charged = 0;
 	}
 
-	BOOL TimerClip::TryConsume(INT32 Count)
+	bool TimerClip::tryConsume(int count)
 	{
-		if (Count <= 0) return TRUE;
-		if (Charged >= Count)
+		if (count <= 0) return true;
+		if (Charged >= count)
 		{
-			Charged -= Count;
-			return TRUE;
+			Charged -= count;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
-	INT32 TimerClip::TryConsumePart(INT32 Count)
+	int TimerClip::tryConsumePart(int count)
 	{
 
-		if (Count <= 0) return 1;
-		INT32 TempCharged = Charged;
-		Count = min(TempCharged, Count);
-		Charged -= Count;
-		return Count;
+		if (count <= 0) return 1;
+		int TempCharged = Charged;
+		count = min(TempCharged, count);
+		Charged -= count;
+		return count;
 	}
 
-	BOOL TimerClip::GiveTime(INT32 TimeGived)
+	void TimerClip::reset()
+	{
+		clearStates();
+	}
+
+	bool TimerClip::giveTime(int timeGived)
 	{
 		if (Charged >= MaxCharge)
 		{
 			TimeRemain = 0;
-			return FALSE;
+			return false;
 		}
-		if (!GiveTime_Default(TimeGived)) return FALSE;
+		if (!__super::giveTime(timeGived)) return false;
 		if (Cycle == 0 && Charged < MaxCharge)
 		{
 			Charged = MaxCharge;
 			TimeRemain = 0;
-			return TRUE;
+			return true;
 		}
-		INT32 ChargeInc = (INT32)TVOSafeDivINT64(TimeRemain, Cycle);
-		if (!ChargeInc) return FALSE;
+		int ChargeInc = (int)TVOSafeDivInt64(TimeRemain, Cycle);
+		if (!ChargeInc) return false;
 		if (Charged + ChargeInc >= MaxCharge || Charged + ChargeInc < 0)
 		{
 			Charged = MaxCharge;
 			TimeRemain = 0;
-			return TRUE;
+			return true;
 		}
 		Charged += ChargeInc;
-		TimeRemain = TVOSafeModINT64(TimeRemain, Cycle);
-		return TRUE;
+		TimeRemain = TVOSafeModInt64(TimeRemain, Cycle);
+		return true;
 	}
 };

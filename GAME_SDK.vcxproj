@@ -85,9 +85,10 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -99,8 +100,9 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -115,12 +117,15 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <StructMemberAlignment>Default</StructMemberAlignment>
-      <WarningLevel>Level2</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <StructMemberAlignment>Default</StructMemberAlignment>
+      <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -133,7 +138,7 @@
     <ClCompile Include="GameObject2D.cpp" />
     <ClCompile Include="GridSelector.cpp" />
     <ClCompile Include="KeyFunctionMap.cpp" />
-    <ClCompile Include="MathList.cpp" />
+    <ClCompile Include="AsgmMath.cpp" />
     <ClCompile Include="McsJudge.cpp" />
     <ClCompile Include="TextFormatFactory.cpp" />
     <ClCompile Include="TimeVariantObject.cpp" />
@@ -150,7 +155,7 @@
     <ClInclude Include="GameObject2D.h" />
     <ClInclude Include="GridSelector.h" />
     <ClInclude Include="KeyFunctionMap.h" />
-    <ClInclude Include="MathList.h" />
+    <ClInclude Include="AsgmMath.h" />
     <ClInclude Include="McsJudge.h" />
     <ClInclude Include="TextFormatFactory.h" />
     <ClInclude Include="TimeVariantObject.h" />

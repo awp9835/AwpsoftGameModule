@@ -1,12 +1,20 @@
 #include "CallbackTree.h"
 namespace AwpSoftGameModule
 {
-	void StartCallbackTree(CallbackTreeFunction Root)
+	void EnterStdcallCallbackTree(StdcallCallbackTreeFunctionAddress root, void* sharedParamsAddress)
 	{
-		CallbackTreeFunction Next = Root;
-		while (Next)
+		StdcallCallbackTreeFunctionAddress next = root;
+		while (next)
 		{
-			Next = (CallbackTreeFunction)((*Next)());
+			next = (StdcallCallbackTreeFunctionAddress)((*next)(sharedParamsAddress));
+		}
+	}
+	void EnterCdeclCallbackTree(CdeclCallbackTreeFunctionAddress root, void* sharedParamsAddress)
+	{
+		CdeclCallbackTreeFunctionAddress next = root;
+		while (next)
+		{
+			next = (CdeclCallbackTreeFunctionAddress)((*next)(sharedParamsAddress));
 		}
 	}
 };

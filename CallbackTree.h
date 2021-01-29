@@ -1,7 +1,9 @@
 #pragma once
-#include<Windows.h>
+#include <process.h>
 namespace AwpSoftGameModule
 {
-	typedef LPVOID(CALLBACK *CallbackTreeFunction)(void);
-	extern void StartCallbackTree(CallbackTreeFunction Root);
+	typedef void* (__stdcall *StdcallCallbackTreeFunctionAddress)(void*);
+	typedef void* (__cdecl *CdeclCallbackTreeFunctionAddress)(void*);
+	extern void EnterStdcallCallbackTree(StdcallCallbackTreeFunctionAddress root, void* sharedParamsAddress);
+	extern void EnterCdeclCallbackTree(CdeclCallbackTreeFunctionAddress root, void* sharedParamsAddress);
 };

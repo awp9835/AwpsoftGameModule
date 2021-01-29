@@ -5,36 +5,37 @@ namespace AwpSoftGameModule
 	class TimeVariantObject
 	{
 	public:
-		INT64 TimeRemain;
-		BOOL DisableTimeVariant;
+		long long TimeRemain;
+		bool DisableTimeVariant;
 		TimeVariantObject();
 		virtual ~TimeVariantObject();
-		void ClearTimeRemain();
-		virtual BOOL GiveTime(INT32 TimeGived);
-	protected:
-		BOOL GiveTime_Default(INT32 TimeGived);
+		void clearTimeRemain();
+		virtual void reset();
+		virtual bool giveTime(int timeGived);
 	};
 	class TimerTrigger :public TimeVariantObject
 	{
 
 	public:
-		BOOL Ready;
-		UINT32 Cycle;
-		TimerTrigger(INT32 TimerCycle = 1);
-		void ClearStates();
-		BOOL TryTriggerOnce();
-		virtual BOOL GiveTime(INT32 TimeGived);
+		bool Ready;
+		int Cycle;
+		TimerTrigger(int timerCycle = 1);
+		void clearStates();
+		bool tryTriggerOnce();
+		virtual void reset();
+		virtual bool giveTime(int timeGived);
 	};
 	class TimerClip :public TimeVariantObject
 	{
 	public:
-		INT32 Charged;
-		INT32 MaxCharge;
-		UINT32 Cycle;
-		TimerClip(INT32 MaximumCharge = 1, INT32 TimerCycle = 1);
-		void ClearStates();
-		BOOL TryConsume(INT32 Count = 1);
-		INT32 TryConsumePart(INT32 Count = 1);
-		virtual BOOL GiveTime(INT32 TimeGived);
+		int Charged;
+		int MaxCharge;
+		int Cycle;
+		TimerClip(int maximumCharge = 1, int timerCycle = 1);
+		void clearStates();
+		bool tryConsume(int count = 1);
+		int tryConsumePart(int count = 1);
+		virtual void reset();
+		virtual bool giveTime(int timeGived);
 	};
 };

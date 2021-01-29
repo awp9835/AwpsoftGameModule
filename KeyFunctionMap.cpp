@@ -11,7 +11,7 @@ namespace AwpSoftGameModule
 	{
 	}
 
-	void FunctionToKey::SetKeysOfFunction(INT32 FunctionIndex, BYTE Key1, BYTE Key2, BYTE Key3, BYTE Key4)
+	void FunctionToKey::SetKeysOfFunction(int FunctionIndex, unsigned char Key1, unsigned char Key2, unsigned char Key3, unsigned char Key4)
 	{
 
 		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
@@ -19,7 +19,7 @@ namespace AwpSoftGameModule
 			return;
 		}
 
-		DWORD temp = Key4;
+		unsigned int temp = Key4;
 		temp <<= 8;
 		temp |= Key3;
 		temp <<= 8;
@@ -29,7 +29,7 @@ namespace AwpSoftGameModule
 		KeysOfFunction[FunctionIndex] = temp;
 	}
 
-	DWORD FunctionToKey::GetKeysOfFunction(INT32 FunctionIndex)
+	unsigned int FunctionToKey::GetKeysOfFunction(int FunctionIndex)
 	{
 		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
 		{
@@ -39,20 +39,20 @@ namespace AwpSoftGameModule
 		return KeysOfFunction[FunctionIndex];
 	}
 
-	BOOL FunctionToKey::GetFunctionState(INT32 FunctionIndex)
+	bool FunctionToKey::GetFunctionState(int FunctionIndex)
 	{
 		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
 		{
-			return FALSE;
+			return false;
 		}
-		DWORD temp = KeysOfFunction[FunctionIndex];
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
+		unsigned int temp = KeysOfFunction[FunctionIndex];
+		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
+		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
+		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return TRUE;
-		return FALSE;
+		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
+		return false;
 	}
 };

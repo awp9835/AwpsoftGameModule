@@ -48,10 +48,10 @@
     <ClCompile Include="McsJudge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathList.cpp">
+    <ClCompile Include="XA2Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XA2Player.cpp">
+    <ClCompile Include="AsgmMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,10 +95,10 @@
     <ClInclude Include="McsJudge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MathList.h">
+    <ClInclude Include="XA2Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XA2Player.h">
+    <ClInclude Include="AsgmMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

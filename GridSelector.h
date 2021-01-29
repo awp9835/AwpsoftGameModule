@@ -1,5 +1,6 @@
 #pragma once
-#include<Windows.h>
+#include <Windows.h>
+#include <vector>
 namespace AwpSoftGameModule
 {
 	enum SelectorMenuStyle
@@ -13,30 +14,34 @@ namespace AwpSoftGameModule
 	class GridSelector
 	{
 	private:
-		DWORD PrimaryAdd();
-		DWORD PrimarySub();
-		DWORD SecondaryAdd();
-		DWORD SecondarySub();
+		unsigned int primaryAdd();
+		unsigned int primarySub();
+		unsigned int secondaryAdd();
+		unsigned int secondarySub();
 	protected:
-		DWORD CurrentSelect; // Secondary:&0xFFFF0000  Primary:&0x0000FFFF
 		SelectorMenuStyle MenuStyle;
-		DWORD *UnitAttribute;     // Valid:&0xFF000000 Unlock:&&0x00FF0000 Value:&0x0000FFFF
-		UINT PKinds, SKinds;
-		UINT Flatten(USHORT Index, USHORT SecondaryIndex);
+		unsigned int CurrentSelect; // Secondary:&0xFFFF0000  Primary:&0x0000FFFF
+		unsigned int PKinds, SKinds;
+		std::vector<unsigned int> UnitAttribute;     // Valid:&0xFF000000 Unlock:&&0x00FF0000 Value:&0x0000FFFF
+		unsigned int flatten(unsigned short id, unsigned short secondaryIndex);
 	public:
-		GridSelector(SelectorMenuStyle Style, USHORT Sorts, USHORT SecondarySorts = 1);
+		static constexpr auto Attribute_Valid = 0xF0000000;
+		static constexpr auto Attribute_Unlock = 0x0F000000;
+		static constexpr auto Attribute_Enable = 0x0F000000;
+		GridSelector(SelectorMenuStyle style, unsigned short sorts, unsigned short cecondarySorts = 1);
 		virtual ~GridSelector();
 		// Valid:&0xF0000000 Unlock:&&0x0F000000 Value:&0x00FFFFFF
-		void SetUnitAttribute(DWORD Attribute, USHORT Index, USHORT SecondaryIndex = 0);
-		void SetCurrentAttribute(DWORD Attribute);
-		DWORD GetUnitAttribute(USHORT Index, USHORT SecondaryIndex = 0);
-		DWORD GetCurrentSelectIndex();
-		void SetCurrentSelectIndex(USHORT Index, USHORT SecondaryIndex = 0);
-		DWORD GetCurrentSelectAttribute();
-		DWORD Up();
-		DWORD Down();
-		DWORD Left();
-		DWORD Right();
+		void setUnitAttribute(unsigned int attribute, unsigned short id, unsigned short secondaryIndex = 0);
+		void setCurrentAttribute(unsigned int attribute);
+		unsigned int getUnitAttribute(unsigned short index, unsigned short secondaryIndex = 0);
+		unsigned short getCurrentSelectIndex();
+		unsigned short getCurrentSelectSecondaryIndex();
+		void SetCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex = 0);
+		unsigned int getCurrentSelectAttribute();
+		unsigned int up();
+		unsigned int down();
+		unsigned int left();
+		unsigned int right();
 	};
 
 };

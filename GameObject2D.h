@@ -7,22 +7,20 @@
 #include "D2D1DrawFactory.h"
 #pragma comment  (lib,"Dxguid.lib")
 #pragma comment  (lib, "d2d1")
-
+#include <vector>
 using namespace D2D1;
 namespace AwpSoftGameModule
 {
 	class GameObject2D :public TimeVariantObject
 	{
 	public:
-		FLOAT PosCenterX, PosCenterY, PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
-		BYTE Enable, Visible, WillDestory, ExistLifeTime;
-		INT64 LifeTime;
+		bool Enable, Visible, WillDestory, ExistLifeTime;
+		float PosCenterX, PosCenterY, PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
+		long long LifeTime;	
 		GameObject2D();
 		virtual ~GameObject2D();
-		BOOL GiveTime_ReduceLifeTime(INT32 TimeGived);
-		virtual BOOL GiveTime(INT32 TimeGived);
-		void Reset_GameObject2D();
-		virtual void ResetGameObject2D();
+		virtual bool giveTime(int timeGived);
+		virtual void reset();
 	};
 	class GameObjectD2D1 :public GameObject2D
 	{
@@ -31,41 +29,39 @@ namespace AwpSoftGameModule
 	public:
 		GameObjectD2D1();
 		virtual ~GameObjectD2D1();
-		void SetImage(ID2D1Bitmap* img);
-		virtual DrawParametersD2D1 GetDrawParameters();
-		virtual void Draw(D2D1DrawFactory *DrawFactory);
-		void Reset_GameObjectD2D1();
-		virtual void ResetGameObject2D();
+		void setImage(ID2D1Bitmap* img);
+		virtual DrawParametersD2D1 getDrawParameters();
+		virtual void draw(D2D1DrawFactory *drawFactory);
+		virtual void reset();
 	};
 	class MovingGameObjectD2D1 :public GameObjectD2D1
 	{
 	public:
-		FLOAT VelocityX, VelocityY, AccelerX, AccelerY, OmegaDEG, EpsilonDEG;
-		INT64 MoveTimeRemain;
+		float VelocityX, VelocityY, AccelerX, AccelerY, OmegaDEG, EpsilonDEG;
+		long long MoveTimeRemain;
 		MovingGameObjectD2D1();
 		virtual ~MovingGameObjectD2D1();
-		BOOL GiveTime_Moving(INT32 TimeGived);
-		virtual BOOL GiveTime(INT32 TimeGived);
-		void Reset_MovingGameObjectD2D1();
-		virtual void ResetGameObject2D();
+		virtual bool giveTime(int timeGived);
+		virtual void reset();
 	};
 	class TextBoxD2D1 :public MovingGameObjectD2D1
 	{
+	protected:
+		std::vector<wchar_t> Text;
+		int StrLength;
 	public:
+		float TextLeftX, TextRightX, TextTopY, TypedLength, TypeSpeed;
+		bool BoundAlpha, BoundTrasnform, UseRelativePos, TypingMode;
+		IDWriteTextFormat *TextFormat;
+		D2D_COLOR_F ColorF;
 		TextBoxD2D1();
 		virtual ~TextBoxD2D1();
-		FLOAT TextLeftX, TextRightX, TextTopY, TypedLength, TypeSpeed;
-		D2D_COLOR_F ColorF;
-		BYTE SuperAlpha, SuperTrasnform, SuperRelativePos, TypeMode;
-		IDWriteTextFormat *TextFormat;
-		WCHAR *StrBuffer;
-		UINT32 StrLength;
-		virtual void ResetGameObject2D();//Only Reset StrLength and TypeMode's TypedLength!
-		virtual BOOL GiveTime(INT32 TimeGived);
-		virtual BOOL GiveTime_TypeText(INT32 TimeGived);
-		void SkipTyping();
-		BOOL TypingComplete();
-		TextParametersD2D1 GetTextParameters();
-		virtual void Draw(D2D1DrawFactory *DrawFactory);
+		void skipTyping();
+		bool typingComplete();
+		void setText(wchar_t* wstr);
+		virtual void reset();
+		virtual bool giveTime(int timeGived);
+		virtual TextParametersD2D1 getTextParameters();
+		virtual void draw(D2D1DrawFactory *drawFactory);
 	};
 };

@@ -1,8 +1,8 @@
 #pragma once
 #include <d2d1.h>
 #include <dshow.h>
-#include<shlwapi.h>
-#include<wincodec.h>
+#include <shlwapi.h>
+#include <wincodec.h>
 #pragma comment  (lib,"User32.lib")
 #pragma comment  (lib,"Gdi32.lib")
 #pragma comment  (lib,"strmiids.lib")
@@ -10,57 +10,60 @@
 #pragma comment  (lib, "Windowscodecs.lib" )
 #pragma comment  (lib, "shlwapi.lib" )
 #pragma comment  (lib, "d2d1.lib" )
+#include <vector>
+#include <atomic>
 namespace AwpSoftGameModule
 {
 	struct DrawParametersD2D1
 	{
-		FLOAT PosCenterX, PosCenterY, PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
-		BOOL Visible;
-		ID2D1Bitmap *Image;//必须用对应的RenderTarget绘制
+		bool Visible;
+		float PosCenterX, PosCenterY, PicCenterX, PicCenterY, RotationDEG, SecondaryAlpha, WScale, HScale;
+		ID2D1Bitmap* Image;//必须用对应的RenderTarget绘制
 		DrawParametersD2D1();
 	};
 	struct TextParametersD2D1
 	{
-		BOOL Visible;
-		FLOAT SecondaryAlpha, XLeft, XRight, YTop;
-		WCHAR *StrBuffer;
-		UINT32 StrLength;
+		bool Visible;
+		int StrLength;
+		float SecondaryAlpha, XLeft, XRight, YTop;
+		wchar_t* StrBuffer;
+		IDWriteTextFormat* TextFormat;
 		D2D_COLOR_F ColorF;
-		IDWriteTextFormat *TextFormat;
 		TextParametersD2D1();
-	};
-	struct ImagesClipD2D1
-	{
-		ID2D1Bitmap* *Images;
-		UINT Frames;
-		ImagesClipD2D1();
 	};
 	class D2D1Created
 	{
 	protected:
-		ID2D1Factory *pFactory;
-		D2D1Created(HWND hwnd);
+		ID2D1Factory* FactoryPtr;
+		D2D1Created();
 		~D2D1Created();
 	};
 	class D2D1DrawFactory :protected D2D1Created
 	{
-
 	protected:
-		ID2D1HwndRenderTarget *pRenderTarget;
-		ID2D1Bitmap* CreateImageFromMemory(IWICBitmapDecoder * pDecoder, LPBYTE Buffer, UINT32 FSize);
-		IWICImagingFactory *pIFactory;
+		bool VerticalSync;
+		int MaxFps;
+		volatile std::atomic<bool> WaitNextFrame;
+		volatile std::atomic<int> ThreadState;
+		ID2D1HwndRenderTarget* RenderTargetPtr;
+		IWICImagingFactory* ImageFactoryPtr;
+		ID2D1Bitmap* createImageFromMemory(IWICBitmapDecoder* decorderPtr, unsigned char* buffer, unsigned int size);
+		static void __cdecl FpsLimitThread(void* _thisPtr);
 	public:
-		D2D1DrawFactory(HWND hwnd, UINT32 Width = 1280, UINT32 Height = 720);
+		D2D1DrawFactory(HWND hwnd, unsigned int width = 1280 , unsigned int height = 720);
+		D2D1DrawFactory(int maxfps, HWND hwnd, unsigned int width = 1280, unsigned int height = 720);
 		virtual ~D2D1DrawFactory();
-		void DrawStep(DrawParametersD2D1 drawPara);
-		void DrawTextStep(TextParametersD2D1 TextPara, BOOL ResetTransForm);
-		void BeginDraw();
-		BOOL EndDraw();
-		ID2D1HwndRenderTarget *GetRenderTarget();
-		ID2D1Bitmap* CreateImageFromMemoryBMP(LPBYTE Buffer, UINT32 FSize);
-		ID2D1Bitmap* CreateImageFromMemoryJPG(LPBYTE Buffer, UINT32 FSize);
-		ID2D1Bitmap* CreateImageFromMemoryPNG(LPBYTE Buffer, UINT32 FSize);
-		ID2D1Bitmap** CreateMultipleImagesFromMemoryGIF(UINT *_return_Frames, LPBYTE Buffer, UINT32 FSize);
-		ImagesClipD2D1 CreateMultipleImagesFromMemoryGIF(LPBYTE Buffer, UINT32 FSize);
+		void drawStep(DrawParametersD2D1 drawPara);
+		void drawTextStep(TextParametersD2D1 textPara, bool resetTransform);
+		void beginDraw();
+		bool endDraw();
+		void setDPI(float dpi = 96.0f);
+		bool changeMaxFps(int maxfps);
+		ID2D1HwndRenderTarget* getInnerHwndRenderTarget();
+		ID2D1Bitmap* createImageFromMemoryBMP(unsigned char* buffer, unsigned int size);
+		ID2D1Bitmap* createImageFromMemoryJPG(unsigned char* buffer, unsigned int size);
+		ID2D1Bitmap* createImageFromMemoryPNG(unsigned char* buffer, unsigned int size);
+		std::vector<ID2D1Bitmap*> createMultipleImagesFromMemoryGIF(unsigned char* buffer, unsigned int size);
+		virtual void sleepMicroSeconds(int microSeconds);
 	};
 };

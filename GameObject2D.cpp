@@ -1,89 +1,68 @@
 #include "GameObject2D.h"
 
-
 namespace AwpSoftGameModule
 {
 	GameObject2D::GameObject2D()
 	{
-		WillDestory = ExistLifeTime = FALSE;
+		WillDestory = ExistLifeTime = false;
 		PosCenterX = PosCenterY = PicCenterX = PicCenterY = RotationDEG = 0.0f;
 		SecondaryAlpha = WScale = HScale = 1.0f;
-		Visible = FALSE;
-		Enable = FALSE;
+		Visible = true;
+		Enable = true;
 		LifeTime = MAXINT64;
 	}
 
 	GameObject2D::~GameObject2D()
 	{
-		Enable = FALSE;
-		Visible = FALSE;
 	}
 
-	BOOL GameObject2D::GiveTime_ReduceLifeTime(INT32 TimeGived)
+
+	bool GameObject2D::giveTime(int timeGived)
 	{
-		if (DisableTimeVariant || !Enable) return FALSE;
+		if (!__super::giveTime(timeGived) || !Enable) return false;
 		if (ExistLifeTime)
 		{
-			LifeTime -= TimeGived;
+			LifeTime -= timeGived;
 			if (LifeTime <= 0)
 			{
-				Enable = FALSE;
-				WillDestory = TRUE;
+				Enable = false;
+				WillDestory = true;
 			}
 		}
-		return TRUE;
+		return true;
 	}
 
-	BOOL GameObject2D::GiveTime(INT32 TimeGived)
+	void GameObject2D::reset()
 	{
-		return GiveTime_ReduceLifeTime(TimeGived);
-	}
-
-	void GameObject2D::Reset_GameObject2D()
-	{
-		WillDestory = ExistLifeTime = FALSE;
+		WillDestory = ExistLifeTime = false;
 		PosCenterX = PosCenterY = PicCenterX = PicCenterY = RotationDEG = 0.0f;
 		SecondaryAlpha = WScale = HScale = 1.0f;
-		Visible = FALSE;
-		Enable = FALSE;
+		Visible = true;
+		Enable = true;
 		LifeTime = MAXINT64;
-	}
-
-	void GameObject2D::ResetGameObject2D()
-	{
-		Enable = FALSE;
-		TimeRemain = 0;
-		DisableTimeVariant = FALSE;
-		Reset_GameObject2D();
 	}
 
 	GameObjectD2D1::GameObjectD2D1()
 	{
-		Image = NULL;
+		Image = nullptr;
 	}
 
 	GameObjectD2D1::~GameObjectD2D1()
 	{
-		Image = NULL;
+		Image = nullptr;
 	}
 
-	void GameObjectD2D1::SetImage(ID2D1Bitmap * img)
+	void GameObjectD2D1::setImage(ID2D1Bitmap * img)
 	{
 		Image = img;
 	}
 
-	DrawParametersD2D1 GameObjectD2D1::GetDrawParameters()
+	DrawParametersD2D1 GameObjectD2D1::getDrawParameters()
 	{
 		DrawParametersD2D1 tmp;
 		if (!Enable) return tmp;
-		//Lock2();
 		tmp.Image = Image;
-		if (!tmp.Image)
-		{
-			//UnLock2();
-			return tmp;
-		}
-
+		if (!tmp.Image) return tmp;
 		tmp.Visible = Visible;
 		tmp.PosCenterX = PosCenterX;
 		tmp.PosCenterY = PosCenterY;
@@ -93,25 +72,19 @@ namespace AwpSoftGameModule
 		tmp.WScale = WScale;
 		tmp.HScale = HScale;
 		tmp.SecondaryAlpha = SecondaryAlpha;
-		//UnLock2();
 		return tmp;
 	}
 
-	void GameObjectD2D1::Draw(D2D1DrawFactory * DrawFactory)
+	void GameObjectD2D1::draw(D2D1DrawFactory * DrawFactory)
 	{
 		if (!Enable || !Visible) return;
-		DrawFactory->DrawStep(GetDrawParameters());
+		DrawFactory->drawStep(getDrawParameters());
 	}
 
-	void GameObjectD2D1::Reset_GameObjectD2D1()
+	void GameObjectD2D1::reset()
 	{
-		Reset_GameObject2D();
-	}
-
-	void GameObjectD2D1::ResetGameObject2D()
-	{
-		Reset_GameObjectD2D1();
-		Image = NULL;
+		__super::reset();
+		Image = nullptr;
 	}
 
 	MovingGameObjectD2D1::MovingGameObjectD2D1()
@@ -129,15 +102,30 @@ namespace AwpSoftGameModule
 	{
 	}
 
-	BOOL MovingGameObjectD2D1::GiveTime(INT32 TimeGived)
+	bool MovingGameObjectD2D1::giveTime(int timeGived)
 	{
-		GiveTime_Moving(TimeGived);
-		return GiveTime_ReduceLifeTime(TimeGived);
+		if (!__super::giveTime(timeGived)) return false;
+		if (MoveTimeRemain > 0 && (long long)timeGived > MoveTimeRemain)
+		{
+			timeGived = (int)MoveTimeRemain;
+		}
+		MoveTimeRemain -= timeGived;
+		PosCenterX += VelocityX * timeGived + AccelerX * (float)timeGived * (float)timeGived / 2.0f;
+		PosCenterY += VelocityY * timeGived + AccelerY * (float)timeGived * (float)timeGived / 2.0f;
+		RotationDEG += OmegaDEG * timeGived + EpsilonDEG * (float)timeGived * (float)timeGived / 2.0f;
+		if (RotationDEG > 360.0f || RotationDEG < -360.0f)
+		{
+			RotationDEG -= (float)((long long)(RotationDEG / 360.0f)) * 360.0f;
+		}
+		VelocityX += AccelerX * timeGived;
+		VelocityY += AccelerY * timeGived;
+		OmegaDEG += EpsilonDEG * timeGived;
+		return true;
 	}
 
-	void MovingGameObjectD2D1::Reset_MovingGameObjectD2D1()
+	void MovingGameObjectD2D1::reset()
 	{
-		Reset_GameObjectD2D1();
+		__super::reset();
 		VelocityX = 0.0f;
 		VelocityY = 0.0f;
 		AccelerX = 0.0f;
@@ -147,93 +135,68 @@ namespace AwpSoftGameModule
 		MoveTimeRemain = -1;
 	}
 
-	void MovingGameObjectD2D1::ResetGameObject2D()
-	{
-		Reset_MovingGameObjectD2D1();
-	}
-
-	BOOL MovingGameObjectD2D1::GiveTime_Moving(INT32 TimeGived)
-	{
-		if (DisableTimeVariant || !Enable) return FALSE;
-		if (MoveTimeRemain == 0) return FALSE;
-		if (MoveTimeRemain > 0 && (long long)TimeGived > MoveTimeRemain)
-		{
-			TimeGived = (INT32)MoveTimeRemain;
-		}
-		MoveTimeRemain -= TimeGived;
-		PosCenterX += VelocityX * TimeGived + AccelerX * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
-		PosCenterY += VelocityY * TimeGived + AccelerY * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
-		RotationDEG += OmegaDEG * TimeGived + EpsilonDEG * (FLOAT)TimeGived * (FLOAT)TimeGived / 2.0f;
-		if (RotationDEG > 360.0f || RotationDEG < -360.0f)
-		{
-			RotationDEG -= (FLOAT)((INT64)(RotationDEG / 360.0f))*360.0f;
-		}
-		VelocityX += AccelerX * TimeGived;
-		VelocityY += AccelerY * TimeGived;
-		OmegaDEG += EpsilonDEG * TimeGived;
-		return TRUE;
-	}
-
-
-
 	TextBoxD2D1::TextBoxD2D1()
 	{
-		StrBuffer = NULL;
+		Text = std::move(std::vector<wchar_t>());
 		StrLength = 0;
 		ColorF = { 1.0f,1.0f,1.0f,1.0f };
-		TextFormat = NULL;
+		TextFormat = nullptr;
 		TextLeftX = TextTopY = 0.0f;
 		TextRightX = 1280.0f;
-		TypeMode = FALSE;
-		TypedLength = 0;
+		TypingMode = false;
+		TypedLength = 0.0f;
 		TypeSpeed = 0.020f;
-		SuperAlpha = FALSE;
-		SuperTrasnform = FALSE;
-		SuperRelativePos = TRUE;
+		BoundAlpha = false;
+		BoundTrasnform = false;
+		UseRelativePos = true;
 	}
 
 	TextBoxD2D1::~TextBoxD2D1()
 	{
 	}
 
-	void TextBoxD2D1::ResetGameObject2D()
+	void TextBoxD2D1::reset()
 	{
-		Reset_MovingGameObjectD2D1();
-		StrLength = 0;
-		if (TypeMode)TypedLength = 0;
+		if(TypingMode) TypedLength = 0;
 	}
 
-	BOOL TextBoxD2D1::GiveTime(INT32 TimeGived)
+	bool TextBoxD2D1::giveTime(int timeGived)
 	{
-		GiveTime_Moving(TimeGived);
-		GiveTime_TypeText(TimeGived);
-		return GiveTime_ReduceLifeTime(TimeGived);
+		if (!__super::giveTime(timeGived)) return false;
+		if (TypedLength < (float)StrLength)
+			TypedLength += TypeSpeed * (float) timeGived;
+		if (TypedLength > (float)StrLength)
+			TypedLength = (float)StrLength;
+		return true;
 	}
 
-	BOOL TextBoxD2D1::GiveTime_TypeText(INT32 TimeGived)
+	void TextBoxD2D1::skipTyping()
 	{
-		if (DisableTimeVariant || !Enable) return FALSE;
-		if (TypedLength < (FLOAT)StrLength)
-			TypedLength += TypeSpeed * (FLOAT)TimeGived;
-		if (TypedLength > (FLOAT)StrLength)
-			TypedLength = (FLOAT)StrLength;
-		return TRUE;
+		TypedLength = (float)StrLength;
 	}
 
-	void TextBoxD2D1::SkipTyping()
+	bool TextBoxD2D1::typingComplete()
 	{
-		TypedLength = (FLOAT)StrLength;
+		if (TypedLength + 0.5 >= (float)StrLength) return true;
+		else return false;
 	}
 
-	BOOL TextBoxD2D1::TypingComplete()
+	void TextBoxD2D1::setText(wchar_t* wstr)
 	{
-		if (TypedLength + 0.5 >= (FLOAT)StrLength)
-			return TRUE;
-		else
-			return FALSE;
+		if (!wstr)
+		{
+			StrLength = 0;
+			TypedLength = 0;
+			Text = std::move(std::vector<wchar_t>());
+			return;
+		}
+		TypedLength = 0.0f;
+		StrLength = (int)wcslen(wstr);
+		Text = std::move(std::vector<wchar_t>(wcslen(wstr) + 1, 0));
+		wcscpy_s(Text.data(), StrLength + 1, wstr);
 	}
 
-	TextParametersD2D1 TextBoxD2D1::GetTextParameters()
+	TextParametersD2D1 TextBoxD2D1::getTextParameters()
 	{
 		TextParametersD2D1 temp;
 		if (!Enable) return temp;
@@ -241,19 +204,19 @@ namespace AwpSoftGameModule
 		if (!temp.Visible) return temp;
 		temp.ColorF = ColorF;
 		temp.TextFormat = TextFormat;
-		temp.StrBuffer = StrBuffer;
-		temp.SecondaryAlpha = SuperAlpha ? SecondaryAlpha : 1.0f;
-		temp.XLeft = SuperRelativePos ? (TextLeftX + PosCenterX) : TextLeftX;
-		temp.XRight = SuperRelativePos ? (TextRightX + PosCenterX) : TextRightX;
-		temp.YTop = SuperRelativePos ? (TextTopY + PosCenterY) : TextTopY;
-		temp.StrLength = (!TypeMode || TypingComplete()) ? StrLength : (max(0, (INT32)(TypedLength + 0.5)));
+		temp.StrBuffer = Text.data();
+		temp.SecondaryAlpha = BoundAlpha ? SecondaryAlpha : 1.0f;
+		temp.XLeft = UseRelativePos ? (TextLeftX + PosCenterX) : TextLeftX;
+		temp.XRight = UseRelativePos ? (TextRightX + PosCenterX) : TextRightX;
+		temp.YTop = UseRelativePos ? (TextTopY + PosCenterY) : TextTopY;
+		temp.StrLength = (!TypingMode || typingComplete()) ? StrLength : (max(0, (int)(TypedLength + 0.5)));
 		return temp;
 	}
 
-	void TextBoxD2D1::Draw(D2D1DrawFactory * DrawFactory)
+	void TextBoxD2D1::draw(D2D1DrawFactory * DrawFactory)
 	{
 		if (!Enable || !Visible) return;
-		DrawFactory->DrawStep(GetDrawParameters());
-		DrawFactory->DrawTextStep(GetTextParameters(), !SuperTrasnform);
+		DrawFactory->drawStep(getDrawParameters());
+		DrawFactory->drawTextStep(getTextParameters(), !BoundTrasnform);
 	}
 };

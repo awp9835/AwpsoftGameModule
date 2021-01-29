@@ -3,75 +3,76 @@
 namespace AwpSoftGameModule
 {
 
-	BOOL McsjJudgeAbsoluteCircles(FLOAT x1, FLOAT y1, FLOAT r1, FLOAT x2, FLOAT y2, FLOAT r2)
+	bool AsgmJudgeAbsoluteCircles(float x1, float y1, float r1, float x2, float y2, float r2)
 	{
 		return (x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1) < (r1 + r2)*(r1 + r2);
-
 	}
 
-	BOOL McsjJudgeRelativeCircles(
-		FLOAT OriginX1, FLOAT OriginY1,
-		FLOAT CRotationDEG1, RelativeCircle Circle1,
-		FLOAT OriginX2, FLOAT OriginY2,
-		FLOAT CRotationDEG2, RelativeCircle Circle2
+	bool AsgmJudgeRelativeCircles(
+		float originX1, float originY1,
+		float centerOfRotationDEG1, RelativeCircle circle1,
+		float originX2, float originY2,
+		float centerOfRotationDEG2, RelativeCircle circle2
 	)
 	{
-		return McsjJudgeAbsoluteCircles(
-			OriginX1 + Circle1.CenterDistance*MathListCosDEG(Circle1.ThetaDEG + CRotationDEG1),
-			OriginY1 + Circle1.CenterDistance*MathListSinDEG(Circle1.ThetaDEG + CRotationDEG1),
-			Circle1.Radius,
-			OriginX2 + Circle2.CenterDistance*MathListCosDEG(Circle2.ThetaDEG + CRotationDEG2),
-			OriginY2 + Circle2.CenterDistance*MathListSinDEG(Circle2.ThetaDEG + CRotationDEG2),
-			Circle2.Radius
+		return AsgmJudgeAbsoluteCircles(
+			originX1 + circle1.CenterDistance * AsgmCosD(circle1.ThetaDEG + centerOfRotationDEG1),
+			originY1 + circle1.CenterDistance * AsgmSinD(circle1.ThetaDEG + centerOfRotationDEG1),
+			circle1.Radius,
+			originX2 + circle2.CenterDistance * AsgmCosD(circle2.ThetaDEG + centerOfRotationDEG2),
+			originY2 + circle2.CenterDistance * AsgmSinD(circle2.ThetaDEG + centerOfRotationDEG2),
+			circle2.Radius
 		);
 	}
 
-	UINT32 McsjJudgeMultipleRelativeCirclesCNT(
-		FLOAT OriginX1, FLOAT OriginY1, FLOAT CRotationDEG1,
-		RelativeCircle *CircleArray1, UINT32 CircleCount1,
-		FLOAT OriginX2, FLOAT OriginY2, FLOAT CRotationDEG2,
-		RelativeCircle *CircleArray2, UINT32 CircleCount2
+	int AsgmJudgeMultipleRelativeCirclesCNT(
+		float originX1, float originY1, float centerOfRotationDEG1,
+		RelativeCircle *circleArray1, int circleCount1,
+		float originX2, float originY2, float centerOfRotationDEG2,
+		RelativeCircle *circleArray2, int circleCount2
 	)
 	{
-		UINT32 i, j, cnt = 0;
-		for (i = 0; i < CircleCount1; i++)
-			for (j = 0; j < CircleCount2; j++)
+		int cnt = 0;
+		for (int i = 0; i < circleCount1; i++)
+		{
+			for (int j = 0; j < circleCount2; j++)
 			{
-				cnt += McsjJudgeRelativeCircles(
-					OriginX1, OriginY1,
-					CRotationDEG1, CircleArray1[i],
-					OriginX2, OriginY2,
-					CRotationDEG2, CircleArray2[j]
+				cnt += AsgmJudgeRelativeCircles(
+					originX1, originY1,
+					centerOfRotationDEG1, circleArray1[i],
+					originX2, originY2,
+					centerOfRotationDEG2, circleArray2[j]
 				);
 			}
-
+		}
 		return cnt;
 	}
 
 
-	BOOL McsjJudgeMultipleRelativeCircles(
-		FLOAT OriginX1, FLOAT OriginY1, FLOAT CRotationDEG1,
-		RelativeCircle *CircleArray1, UINT32 CircleCount1,
-		FLOAT OriginX2, FLOAT OriginY2, FLOAT CRotationDEG2,
-		RelativeCircle *CircleArray2, UINT32 CircleCount2
+	bool AsgmJudgeMultipleRelativeCircles(
+		float originX1, float originY1, float centerOfRotationDEG1,
+		RelativeCircle *circleArray1, int circleCount1,
+		float OriginX2, float OriginY2, float centerOfRotationDEG2,
+		RelativeCircle *circleArray2, int circleCount2
 	)
 	{
-		UINT32 i, j;
-		for (i = 0; i < CircleCount1; i++)
-			for (j = 0; j < CircleCount2; j++)
+		for (int i = 0; i < circleCount1; i++)
+		{
+			for (int j = 0; j < circleCount2; j++)
 			{
 				if (
-					McsjJudgeRelativeCircles(
-						OriginX1, OriginY1,
-						CRotationDEG1, CircleArray1[i],
+					AsgmJudgeRelativeCircles(
+						originX1, originY1,
+						centerOfRotationDEG1, circleArray1[i],
 						OriginX2, OriginY2,
-						CRotationDEG2, CircleArray2[j]
+						centerOfRotationDEG2, circleArray2[j]
 					)
 					)
 				{
-					return TRUE;
+					return true;
 				}
 			}
-		return FALSE;
+		}
+		return false;
 	}
 };

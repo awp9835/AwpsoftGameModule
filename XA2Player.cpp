@@ -3,23 +3,23 @@
 #include <cstdio>
 namespace AwpSoftGameModule
 {
-	void XA2PlayerMaster::AddRef() 
+	void XA2PlayerMaster::addRef() 
 	{ 
 		Reference++; 
 	}
 
-	void XA2PlayerMaster::Release()
+	void XA2PlayerMaster::release()
 	{
 		Reference--;
 		if (!Reference)
 		{
 			if (Enable) 
 			{
-				Enable = FALSE;
+				Enable = false;
 				XA2Master->DestroyVoice();
-				XA2Master = NULL;
+				XA2Master = nullptr;
 				XA2->Release();
-				XA2 = NULL;
+				XA2 = nullptr;
 			}
 			delete this;
 		}
@@ -28,9 +28,9 @@ namespace AwpSoftGameModule
 	{
 		HRESULT hr;
 		Reference = 1;
-		Enable = FALSE;
-		XA2 = NULL;
-		XA2Master = NULL;
+		Enable = false;
+		XA2 = nullptr;
+		XA2Master = nullptr;
 		CoInitializeEx(0, COINIT_MULTITHREADED);
 		hr = XAudio2Create(&XA2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 		if (FAILED(hr))
@@ -41,32 +41,32 @@ namespace AwpSoftGameModule
 		if (FAILED(hr))
 		{
 			XA2->Release();
-			XA2 = NULL;
+			XA2 = nullptr;
 			return;
 		}
-		Enable = TRUE;
+		Enable = true;
 	}
-	void XA2PlayerMaster::SetVolume(FLOAT rate)
+	void XA2PlayerMaster::setVolume(float volume)
 	{
 		if (Enable)
 		{
-			XA2Master->SetVolume(rate);
+			XA2Master->SetVolume(volume);
 		}
 	}
 
-	FLOAT XA2PlayerMaster::GetVolume()
+	float XA2PlayerMaster::getVolume()
 	{
 		if (!Enable) return 0.0f;
-		FLOAT result;
+		float result;
 		XA2Master->GetVolume(&result);
 		return result;
 	}
-	BOOL XA2PlayerMaster::IsEnable()
+	bool XA2PlayerMaster::enable()
 	{
 		return Enable;
 	}
 
-	IXAudio2 * XA2PlayerMaster::GetXAudio2Ptr()
+	IXAudio2 * XA2PlayerMaster::getInnerXAudio2Ptr()
 	{
 		return XA2;
 	}
@@ -77,7 +77,7 @@ namespace AwpSoftGameModule
 
 
 
-	void XA2Player::Replay()
+	void XA2Player::replay()
 	{
 		if (!Enable) return;
 		if (!LastBuffer.pAudioData) return;
@@ -86,7 +86,7 @@ namespace AwpSoftGameModule
 		SourcePoster->SubmitSourceBuffer(&LastBuffer);
 		SourcePoster->Start();
 	}
-	void XA2Player::Stop()
+	void XA2Player::stop()
 	{
 		if (Enable)
 		{
@@ -94,49 +94,49 @@ namespace AwpSoftGameModule
 			SourcePoster->FlushSourceBuffers();
 		}
 	}
-	void XA2Player::Pause()
+	void XA2Player::pause()
 	{
 		if (Enable)
 		{
 			SourcePoster->Stop();
 		}
 	}
-	void XA2Player::Continue()
+	void XA2Player::continuePlay()
 	{
 		if (Enable)
 		{
 			SourcePoster->Start();
 		}
 	}
-	void XA2Player::SetVolume(FLOAT rate)
+	void XA2Player::setVolume(float volume)
 	{
 		if (Enable)
 		{
-			SourcePoster->SetVolume(rate);
+			SourcePoster->SetVolume(volume);
 		}
 	}
-	FLOAT XA2Player::GetVolume()
+	float XA2Player::getVolume()
 	{
 		if (!Enable) return 0.0f;
-		FLOAT result;
+		float result;
 		SourcePoster->GetVolume(&result);
 		return result;
 	}
-	void XA2Player::SetFreqRate(FLOAT rate)
+	void XA2Player::setFreqRate(float rate)
 	{
 		if (Enable)
 		{
 			SourcePoster->SetFrequencyRatio(rate);
 		}
 	}
-	FLOAT XA2Player::GetFreqRate()
+	float XA2Player::getFreqRate()
 	{
 		if (!Enable) return 1.0f;
-		FLOAT result;
+		float result;
 		SourcePoster->GetFrequencyRatio(&result);
 		return result;
 	}
-	void XA2Player::SetInputSampleRate(UINT sampleRate)
+	void XA2Player::setInputSampleRate(unsigned int sampleRate)
 	{
 		if (!Enable) return;
 		if (sampleRate == 0) sampleRate = OriginFormat[0].nSamplesPerSec;
@@ -144,11 +144,11 @@ namespace AwpSoftGameModule
 	}
 	XA2Player::XA2Player(XA2PlayerMaster * master, WAVEFORMATEX * inputFormat)
 	{
-		Enable = FALSE;
-		SourcePoster = NULL;
+		Enable = false;
+		SourcePoster = nullptr;
 		memset(&LastBuffer, 0, sizeof(XAUDIO2_BUFFER));
 		if (!master) return;
-		if (!master->IsEnable()) return;
+		if (!master->enable()) return;
 
 		if (!inputFormat)
 		{
@@ -169,35 +169,35 @@ namespace AwpSoftGameModule
 			memcpy(OriginFormat, inputFormat, sizeof(WAVEFORMATEX) + inputFormat->cbSize);
 		}
 		
-		HRESULT hr = master->GetXAudio2Ptr()->CreateSourceVoice(&SourcePoster,OriginFormat);
+		HRESULT hr = master->getInnerXAudio2Ptr()->CreateSourceVoice(&SourcePoster,OriginFormat);
 		if (FAILED(hr)) return;
 		Master = master;
-		master ->AddRef();
-		Enable = TRUE;
+		master ->addRef();
+		Enable = true;
 	}
 	XA2Player::~XA2Player()
 	{
 		if (Enable)
 		{
-			Enable = FALSE;
+			Enable = false;
 			SourcePoster->DestroyVoice();
-			SourcePoster = NULL;
-			Master->Release();
-			Master = NULL;
+			SourcePoster = nullptr;
+			Master->release();
+			Master = nullptr;
 		}
 	}
-	BOOL XA2Player::IsEnable()
+	bool XA2Player::enable()
 	{
 		return Enable;
 	}
-	BOOL XA2Player::IsSafeToRelease()
+	bool XA2Player::isSafeToReleasePostedBuffers()
 	{
-		if (!Enable) return TRUE;
+		if (!Enable) return true;
 		XAUDIO2_VOICE_STATE s;
 		SourcePoster->GetState(&s);
 		return !s.BuffersQueued;
 	}
-	void XA2Player::Play(XAUDIO2_BUFFER *xa2Buffer, BOOL resetIfNoChange)
+	void XA2Player::play(XAUDIO2_BUFFER *xa2Buffer, bool resetIfNoChange)
 	{
 		if (!Enable) return;
 		if (!xa2Buffer)
@@ -251,7 +251,7 @@ namespace AwpSoftGameModule
 			}
 		}
 	}
-	void XA2Player::Play(BYTE * startAddress, UINT32 endOffset_orSize, BOOL resetIfNoChange, BOOL loop, UINT32 loopStartOffset, UINT32 loopEndOffset)
+	void XA2Player::play(unsigned char * startAddress, unsigned int endOffset_orSize, bool resetIfNoChange, bool loop, unsigned int loopStartOffset, unsigned int loopEndOffset)
 	{
 		XAUDIO2_BUFFER bemp;
 		memset(&bemp, 0, sizeof(XAUDIO2_BUFFER));
@@ -267,6 +267,6 @@ namespace AwpSoftGameModule
 			bemp.LoopBegin = loopStartOffset / OriginFormat->nBlockAlign;
 			bemp.LoopLength = (loopEndOffset - loopStartOffset) / OriginFormat->nBlockAlign;
 		}
-		Play(&bemp, resetIfNoChange);
+		play(&bemp, resetIfNoChange);
 	}
 };

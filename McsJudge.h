@@ -1,6 +1,6 @@
 #pragma once
 /*header*/
-#include "MathList.h"
+#include "AsgmMath.h"
 #include <windows.h>
 namespace AwpSoftGameModule
 {
@@ -8,36 +8,33 @@ namespace AwpSoftGameModule
 	struct RelativeCircle
 	{
 		//Using left-hand-polar coordinate system
-		FLOAT CenterDistance;	//Distance from center of this circle to origin
-		FLOAT ThetaDEG;	//Polar angle
-		FLOAT Radius; //Radius of this circle
+		float CenterDistance;	//Distance from center of this circle to origin
+		float ThetaDEG;	//Polar angle
+		float Radius; //Radius of this circle
 	};
 
 	/*function*/
-	extern BOOL McsjJudgeAbsoluteCircles(
-		FLOAT x1, FLOAT y1, FLOAT r1,
-		FLOAT x2, FLOAT y2, FLOAT r2
+	extern bool AsgmJudgeAbsoluteCircles(
+		float x1, float y1, float r1,
+		float x2, float y2, float r2
 	);
 
-
-	extern BOOL McsjJudgeRelativeCircles(
-		//About 100,000,000t/1.5s RELEASE
-		//About 100,000,000t/35s DEBUG
-		FLOAT OriginX1, FLOAT OriginY1,
-		FLOAT CRotationDEG1, RelativeCircle Circle1,
-		FLOAT OriginX2, FLOAT OriginY2,
-		FLOAT CRotationDEG2, RelativeCircle Circle2
+	extern bool AsgmJudgeRelativeCircles(
+		float originX1, float originY1,
+		float centerOfRotationDEG1, RelativeCircle circle1,
+		float originX2, float originY2,
+		float centerOfRotationDEG2, RelativeCircle circle2
 	);
-	extern UINT32 McsjJudgeMultipleRelativeCirclesCNT(
-		FLOAT OriginX1, FLOAT OriginY1, FLOAT CRotationDEG1,
-		RelativeCircle *CircleArray1, UINT32 CircleCount1,
-		FLOAT OriginX2, FLOAT OriginY2, FLOAT CRotationDEG2,
-		RelativeCircle *CircleArray2, UINT32 CircleCount2
+	extern int AsgmJudgeMultipleRelativeCirclesCNT(
+		float originX1, float originY1, float centerOfRotationDEG1,
+		RelativeCircle*circleArray1, int circleCount1,
+		float originX2, float originY2, float centerOfRotationDEG2,
+		RelativeCircle*circleArray2,  int circleCount2
 	);
-	extern BOOL McsjJudgeMultipleRelativeCircles(
-		FLOAT OriginX1, FLOAT OriginY1, FLOAT CRotationDEG1,
-		RelativeCircle *CircleArray1, UINT32 CircleCount1,
-		FLOAT OriginX2, FLOAT OriginY2, FLOAT CRotationDEG2,
-		RelativeCircle *CircleArray2, UINT32 CircleCount2
+	extern bool AsgmJudgeMultipleRelativeCircles(
+		float originX1, float originY1, float centerOfRotationDEG1,
+		RelativeCircle*circleArray1,  int circleCount1,
+		float originX2, float originY2, float centerOfRotationDEG2,
+		RelativeCircle*circleArray2,  int circleCount2
 	);
 };

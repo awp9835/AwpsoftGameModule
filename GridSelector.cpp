@@ -2,9 +2,9 @@
 #include <new>
 namespace AwpSoftGameModule
 {
-	DWORD GridSelector::PrimaryAdd()
+	unsigned int GridSelector::primaryAdd()
 	{
-		DWORD i, s, t;
+		unsigned int i, s, t;
 		i = CurrentSelect & 0x0000FFFF;
 		s = CurrentSelect & 0xFFFF0000;
 		switch (MenuStyle)
@@ -16,7 +16,7 @@ namespace AwpSoftGameModule
 			while (i < PKinds - 1)
 			{
 				i++;
-				t = UnitAttribute[Flatten((USHORT)i, 0)];
+				t = UnitAttribute[flatten((unsigned short)i, 0)];
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = i;
@@ -28,7 +28,7 @@ namespace AwpSoftGameModule
 			while (i < PKinds - 1)
 			{
 				i++;
-				t = UnitAttribute[Flatten((USHORT)i, s >> 16)];
+				t = UnitAttribute[flatten((unsigned short)i, s >> 16)];
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = i | s;
@@ -42,9 +42,9 @@ namespace AwpSoftGameModule
 		return CurrentSelect;
 	}
 
-	DWORD GridSelector::PrimarySub()
+	unsigned int GridSelector::primarySub()
 	{
-		DWORD i, s, t;
+		unsigned int i, s, t;
 		i = CurrentSelect & 0x0000FFFF;
 		s = CurrentSelect & 0xFFFF0000;
 		switch (MenuStyle)
@@ -56,7 +56,7 @@ namespace AwpSoftGameModule
 			while (i > 0)
 			{
 				i--;
-				t = UnitAttribute[(USHORT)Flatten((USHORT)i, 0)];
+				t = UnitAttribute[(unsigned short)flatten((unsigned short)i, 0)];
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = i;
@@ -68,7 +68,7 @@ namespace AwpSoftGameModule
 			while (i > 0)
 			{
 				i--;
-				t = GetUnitAttribute((USHORT)i, s >> 16);
+				t = getUnitAttribute((unsigned short)i, s >> 16);
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = i | s;
@@ -82,9 +82,9 @@ namespace AwpSoftGameModule
 		return CurrentSelect;
 	}
 
-	DWORD GridSelector::SecondaryAdd()
+	unsigned int GridSelector::secondaryAdd()
 	{
-		DWORD i, s, t;
+		unsigned int i, s, t;
 		i = CurrentSelect & 0x0000FFFF;
 		s = CurrentSelect & 0xFFFF0000;
 		s >>= 16;
@@ -99,7 +99,7 @@ namespace AwpSoftGameModule
 			while (s < SKinds - 1)
 			{
 				s++;
-				t = UnitAttribute[Flatten((USHORT)i, (USHORT)s)];
+				t = UnitAttribute[flatten((unsigned short)i, (unsigned short)s)];
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = (s << 16) | i;
@@ -112,9 +112,9 @@ namespace AwpSoftGameModule
 		}
 		return CurrentSelect;
 	}
-	DWORD GridSelector::SecondarySub()
+	unsigned int GridSelector::secondarySub()
 	{
-		DWORD i, s, t;
+		unsigned int i, s, t;
 		i = CurrentSelect & 0x0000FFFF;
 		s = CurrentSelect & 0xFFFF0000;
 		s >>= 16;
@@ -129,7 +129,7 @@ namespace AwpSoftGameModule
 			while (s > 0)
 			{
 				s--;
-				t = UnitAttribute[Flatten((USHORT)i, (USHORT)s)];
+				t = UnitAttribute[flatten((unsigned short)i, (unsigned short)s)];
 				if ((t & 0xF0000000) && (t & 0x0F000000))
 				{
 					CurrentSelect = (s << 16) | i;
@@ -143,18 +143,18 @@ namespace AwpSoftGameModule
 		return CurrentSelect;
 	}
 
-	UINT GridSelector::Flatten(USHORT Index, USHORT SecondaryIndex)
+	unsigned int GridSelector::flatten(unsigned short index, unsigned short secondaryIndex)
 	{
-		return Index * SKinds + SecondaryIndex;
+		return index * SKinds + secondaryIndex;
 	}
 
-	GridSelector::GridSelector(SelectorMenuStyle Style, USHORT Kinds, USHORT SecondaryKinds)
+	GridSelector::GridSelector(SelectorMenuStyle style, unsigned short kinds, unsigned short secondaryKinds)
 	{
-		MenuStyle = Style;
-		PKinds = Kinds;
-		SKinds = SecondaryKinds;
+		MenuStyle = style;
+		PKinds = kinds;
+		SKinds = secondaryKinds;
 		CurrentSelect = 0x0;
-		switch (Style)
+		switch (style)
 		{
 		case MNSTYLE_V:
 		case MNSTYLE_H:
@@ -166,68 +166,55 @@ namespace AwpSoftGameModule
 			break;
 
 		}
-
-		try
-		{
-			UnitAttribute = new DWORD[PKinds*SKinds];
-		}
-		catch (std::bad_alloc &)
-		{
-			MessageBox(NULL, L"Not Enough Memory!", L"Fatal Error!", MB_ICONERROR);
-			exit(0);
-		}
-		memset(UnitAttribute, 0, sizeof(DWORD)*PKinds*SKinds);
-		for (UINT i = 0; i < PKinds * SKinds; i++)
-		{
-			UnitAttribute[i] = 0xFF000000;
-		}
+		UnitAttribute = std::move(std::vector<unsigned int>(SKinds * PKinds , 0xFF000000));
 	}
 
 	GridSelector::~GridSelector()
 	{
-		if (UnitAttribute) delete[] UnitAttribute;
-		UnitAttribute = NULL;
 	}
 
-	void GridSelector::SetUnitAttribute(DWORD Attribute, USHORT Index, USHORT SecondaryIndex)
+	void GridSelector::setUnitAttribute(unsigned int attribute, unsigned short index, unsigned short secondaryIndex)
 	{
-		Index = min(Index, PKinds - 1);
-		SecondaryIndex = min(SecondaryIndex, SKinds - 1);
-		UnitAttribute[Flatten(Index, SecondaryIndex)] = Attribute;
+		index = (unsigned short)min((unsigned int)index, PKinds - 1);
+		secondaryIndex = (unsigned short)min((unsigned int)secondaryIndex, SKinds - 1);
+		UnitAttribute[flatten(index, secondaryIndex)] = attribute;
 	}
 
-	void GridSelector::SetCurrentAttribute(DWORD Attribute)
+	void GridSelector::setCurrentAttribute(unsigned int attribute)
 	{
-		DWORD temp = CurrentSelect;
-		UnitAttribute[Flatten(temp & 0x0000FFFF, (temp >> 16) & 0x0000FFFF)] = Attribute;
+		unsigned int temp = CurrentSelect;
+		UnitAttribute[flatten(temp & 0x0000FFFF, (temp >> 16) & 0x0000FFFF)] = attribute;
 	}
 
-	DWORD GridSelector::GetUnitAttribute(USHORT Index, USHORT SecondaryIndex)
+	unsigned int GridSelector::getUnitAttribute(unsigned short index, unsigned short secondaryIndex)
 	{
-		Index = min(Index, PKinds - 1);
-		SecondaryIndex = min(SecondaryIndex, SKinds - 1);
-		return UnitAttribute[Flatten(Index, SecondaryIndex)];
+		index = (unsigned short)min((unsigned int)index, PKinds - 1);
+		secondaryIndex = (unsigned short)min((unsigned int)secondaryIndex, SKinds - 1);
+		return UnitAttribute[flatten(index, secondaryIndex)];
 	}
 
-	DWORD GridSelector::GetCurrentSelectIndex()
+	unsigned short GridSelector::getCurrentSelectIndex()
 	{
-		return CurrentSelect;
+		return (unsigned short)(CurrentSelect & 0x0000FFFF);
 	}
-
-	void GridSelector::SetCurrentSelectIndex(USHORT Index, USHORT SecondaryIndex)
+	unsigned short GridSelector::getCurrentSelectSecondaryIndex()
 	{
-		Index = min(Index, PKinds - 1);
-		SecondaryIndex = min(SecondaryIndex, SKinds - 1);
-		CurrentSelect = (SecondaryIndex << 16) | Index;
+		return (unsigned short)((CurrentSelect & 0xFFFF0000) >> 16);
 	}
-
-	DWORD GridSelector::GetCurrentSelectAttribute()
+	void GridSelector::SetCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex)
 	{
-		DWORD temp = CurrentSelect;
-		return UnitAttribute[Flatten(temp & 0x0000FFFF, (temp >> 16) & 0x0000FFFF)];
+		index = (unsigned short)min((unsigned int)index, PKinds - 1);
+		secondaryIndex = (unsigned short)min((unsigned int)secondaryIndex, SKinds - 1);
+		CurrentSelect = (secondaryIndex << 16) | index;
 	}
 
-	DWORD GridSelector::Up()
+	unsigned int GridSelector::getCurrentSelectAttribute()
+	{
+		unsigned int temp = CurrentSelect;
+		return UnitAttribute[flatten(temp & 0x0000FFFF, (temp >> 16) & 0x0000FFFF)];
+	}
+
+	unsigned int GridSelector::up()
 	{
 		switch (MenuStyle)
 		{
@@ -236,16 +223,16 @@ namespace AwpSoftGameModule
 		case MNSTYLE_V:
 		case MNSTYLE_VL:
 		case MNSTYLE_GR:
-			return PrimarySub();
+			return primarySub();
 		case MNSTYLE_HL:
-			return SecondarySub();
+			return secondarySub();
 		default:
 			break;
 		}
 		return CurrentSelect;
 	}
 
-	DWORD GridSelector::Down()
+	unsigned int GridSelector::down()
 	{
 		switch (MenuStyle)
 		{
@@ -254,16 +241,16 @@ namespace AwpSoftGameModule
 		case MNSTYLE_V:
 		case MNSTYLE_VL:
 		case MNSTYLE_GR:
-			return PrimaryAdd();
+			return primaryAdd();
 		case MNSTYLE_HL:
-			return SecondaryAdd();
+			return secondaryAdd();
 		default:
 			break;
 		}
 		return CurrentSelect;
 	}
 
-	DWORD GridSelector::Left()
+	unsigned int GridSelector::left()
 	{
 		switch (MenuStyle)
 		{
@@ -271,16 +258,16 @@ namespace AwpSoftGameModule
 			return CurrentSelect;
 		case MNSTYLE_H:
 		case MNSTYLE_HL:
-			return PrimarySub();
+			return primarySub();
 		case MNSTYLE_GR:
 		case MNSTYLE_VL:
-			return SecondarySub();
+			return secondarySub();
 		default:
 			break;
 		}
 		return CurrentSelect;
 	}
-	DWORD GridSelector::Right()
+	unsigned int GridSelector::right()
 	{
 		switch (MenuStyle)
 		{
@@ -288,10 +275,10 @@ namespace AwpSoftGameModule
 			return CurrentSelect;
 		case MNSTYLE_H:
 		case MNSTYLE_HL:
-			return PrimaryAdd();
+			return primaryAdd();
 		case MNSTYLE_GR:
 		case MNSTYLE_VL:
-			return SecondaryAdd();
+			return secondaryAdd();
 		default:
 			break;
 		}

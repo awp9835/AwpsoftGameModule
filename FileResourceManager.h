@@ -1,46 +1,50 @@
 #pragma once
 #include <Windows.h>
 #include <new>
+#include <vector>
 #include <cstdio>
 namespace AwpSoftGameModule
 {
-#define __FILETYPE_BMP 0x504D422E
-#define __FILETYPE_PNG 0x474E502E
-#define __FILETYPE_JPG 0x47504A2E
-#define __FILETYPE_GIF 0x4649472E
-#define __FILETYPE_TXT 0x5458542E
-#define __FILETYPE_WAV 0x5641572E
-#define __FILETYPE_PCM 0x4D43502E
-#define __FILETYPE_DAT 0x5441442E
-#define __FILETYPE_INI 0x494E492E
-#define __FILETYPE_BIN 0x4E49422E
-#define __FILETYPE_CSV 0x5653432E
-	struct FileResourceParameters
+	constexpr auto __FILETYPE_BMP = 0x504D422E;
+	constexpr auto __FILETYPE_PNG = 0x474E502E;
+	constexpr auto __FILETYPE_JPG = 0x47504A2E;
+	constexpr auto __FILETYPE_GIF = 0x4649472E;
+	constexpr auto __FILETYPE_TXT = 0x5458542E;
+	constexpr auto __FILETYPE_WAV = 0x5641572E;
+	constexpr auto __FILETYPE_PCM = 0x4D43502E;
+	constexpr auto __FILETYPE_DAT = 0x5441442E;
+	constexpr auto __FILETYPE_INI = 0x494E492E;
+	constexpr auto __FILETYPE_BIN = 0x4E49422E;
+	constexpr auto __FILETYPE_CSV = 0x5653432E;
+	
+	struct FileResourceInfo
 	{
-		LPBYTE Buffer;
-		UINT32 Index, Type;
-		FLOAT P1, P2;
-		UINT32 Size;
-		FileResourceParameters();
+		unsigned char* Buffer;
+		int FileID, Size;
+		unsigned int Type;
+		float Param1, Param2;
+		FileResourceInfo();
 	};
+
 	class FileResourceManager
 	{
-	private:
-		FileResourceParameters* FileList;
-		UINT32 ArrayLength;
+	protected:
+		std::vector<FileResourceInfo> FileList;
 	public:
-		FileResourceManager(UINT32 MaxFileCount = 0x1000);
+		FileResourceManager(int maxFileCount = 0x1000);
 		virtual ~FileResourceManager();
-		BOOL TakeOverFileResource(FileResourceParameters FRI);
-		FileResourceParameters GetFileResourceParameters(UINT32 FileID);
-		FileResourceParameters TakeOutFileBuffer(UINT32 FileID);
-		UINT32 LoadFile(const WCHAR* FileName, UINT32 FileID, DWORD FileType, FLOAT Para1 = 0.0f, FLOAT Para2 = 0.0f);//return fsize,failed:0
-		UINT32 ReleaseFileResource(UINT32 FileID);
-		UINT64 ReleaseAllFileResource();
-		UINT64 LoadFilesFromPackage(const WCHAR* PackageFileName);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
-		UINT64 LoadRangeFilesFromPackage(const WCHAR* PackageFileName, UINT32 MinFileID = 0, UINT32 MaxFileID = 0x7FFFFFFF);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
-		UINT64 LoadSingleFileFromPackage(const WCHAR* PackageFileName, UINT32 FileID);// 成功/替换数:Low 32 Bits，失败数:High 32 Bits
-		static UINT64 MakePackageFromCSV(const WCHAR* ManifestFileName, const WCHAR* TargetPackageName);//成功数:Low 32 Bits，失败数:High 32 Bits
+		int takeOverFileResource(FileResourceInfo fileInfo);
+		FileResourceInfo getFileResourceInfo(int fileID);
+		FileResourceInfo takeOutFileResource(int fileID);
+		unsigned int loadFile(const wchar_t* fileName, int fileID, unsigned int fileType, float param1 = 0.0f, float param2 = 0.0f); //return fsize,failed:0
+		unsigned int releaseFileResource(int fileID);
+		unsigned long long releaseAllFileResource();
+		virtual int loadFilesFromPackage(const wchar_t* packageFileName);
+		virtual int loadRangeFilesFromPackage(const wchar_t* packageFileName, int minFileID = 0, int maxFileID = 0x7FFFFFFF);
+		virtual unsigned int loadSingleFileFromPackage(const wchar_t* packageFileName, int fileID);
+		virtual int saveAsPackage(const wchar_t* targetPackageName);
+		virtual int makePackageFromCSV(const wchar_t* manifestFileName, const wchar_t* targetPackageName);
+		static int makeDefaultPackageFromCSV(const wchar_t* manifestFileName, const wchar_t* targetPackageName);
 	};
 
 };

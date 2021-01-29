@@ -1,46 +1,112 @@
 #include "TextFormatFactory.h"
 namespace AwpSoftGameModule
 {
-	SingleFontCollectionLoader::~SingleFontCollectionLoader()
+
+	SingleFontCollection::SingleFontFileEnumerator::~SingleFontFileEnumerator()
+	{
+		if (FontFile) FontFile->Release();
+	}
+
+	SingleFontCollection::SingleFontFileEnumerator::SingleFontFileEnumerator(IDWriteFontFile* fontFile)
+	{
+		FontFile = fontFile;
+		if (fontFile) fontFile->AddRef();
+		Reference = 1;
+		CurrentPos = -1;
+	}
+	ULONG STDMETHODCALLTYPE SingleFontCollection::SingleFontFileEnumerator::Release(void)
+	{
+		Reference--;
+		if (Reference == 0)
+		{
+			delete this;
+			return 0;
+		}
+		return Reference;
+	}
+	ULONG STDMETHODCALLTYPE SingleFontCollection::SingleFontFileEnumerator::AddRef(void)
+	{
+		Reference++;
+		return Reference;
+	}
+	HRESULT STDMETHODCALLTYPE SingleFontCollection::SingleFontFileEnumerator::QueryInterface(REFIID riid, void** ppvObject)
+	{
+		if (!ppvObject) return E_INVALIDARG;
+		if (riid == __uuidof(IDWriteFontFileEnumerator))
+		{
+			*ppvObject = (IDWriteFontFileEnumerator*)this;
+			AddRef();
+			return S_OK;
+		}
+		else if (riid == __uuidof(IUnknown))
+		{
+			*ppvObject = (IUnknown*)(IDWriteFontFileEnumerator*)this;
+			AddRef();
+			return S_OK;
+		}
+		else return E_NOTIMPL;
+	}
+
+	HRESULT SingleFontCollection::SingleFontFileEnumerator::GetCurrentFontFile(IDWriteFontFile** fontFile)
+	{
+		if (!fontFile) return E_INVALIDARG;
+		if (!FontFile) return E_NOT_VALID_STATE;
+		*fontFile = FontFile;
+		FontFile->AddRef();
+		return S_OK;
+	}
+
+	HRESULT SingleFontCollection::SingleFontFileEnumerator::MoveNext(BOOL* hasCurrentFile)
+	{
+		if (!hasCurrentFile) return E_INVALIDARG;
+		CurrentPos++;
+		if (CurrentPos == 0)
+		{
+			*hasCurrentFile = TRUE;
+		}
+		else
+		{
+			CurrentPos = 1;
+			*hasCurrentFile = FALSE;
+		}
+		return S_OK;
+	}
+
+	SingleFontCollection::SingleFontCollectionLoader::~SingleFontCollectionLoader()
 	{
 		if (FontFile) FontFile -> Release();
 	}
 
-	SingleFontCollectionLoader::SingleFontCollectionLoader(IDWriteFontFile * para)
+	SingleFontCollection::SingleFontCollectionLoader::SingleFontCollectionLoader(IDWriteFontFile * fontFile)
 	{
-		FontFile = para;
-		if (para) para->AddRef();
-		FirstMove = TRUE;
+		FontFile = fontFile;
+		if (fontFile) fontFile->AddRef();
 		Reference = 1;
 	}
 
-	ULONG __stdcall SingleFontCollectionLoader::Release(void)
+	ULONG STDMETHODCALLTYPE SingleFontCollection::SingleFontCollectionLoader::Release(void)
 	{
 		Reference--;
-		if (!Reference) {
+		if (Reference == 0) 
+		{
 			delete this;
 			return 0;
 		}
 		return Reference;
 	}
 
-	ULONG __stdcall SingleFontCollectionLoader::AddRef(void)
+	ULONG STDMETHODCALLTYPE SingleFontCollection::SingleFontCollectionLoader::AddRef(void)
 	{
 		Reference++;
 		return Reference;
 	}
 
-	HRESULT __stdcall SingleFontCollectionLoader::QueryInterface(REFIID riid, void ** ppvObject)
+	HRESULT STDMETHODCALLTYPE SingleFontCollection::SingleFontCollectionLoader::QueryInterface(REFIID riid, void ** ppvObject)
 	{
+		if (!ppvObject) return E_INVALIDARG;
 		if (riid == __uuidof(IDWriteFontCollectionLoader))
 		{
 			*ppvObject = (IDWriteFontCollectionLoader*)this;
-			AddRef();
-			return S_OK;
-		}
-		else if (riid == __uuidof(IDWriteFontFileEnumerator))
-		{
-			*ppvObject = (IDWriteFontFileEnumerator*)this;
 			AddRef();
 			return S_OK;
 		}
@@ -50,156 +116,132 @@ namespace AwpSoftGameModule
 			AddRef();
 			return S_OK;
 		}
-		return E_FAIL;
+		else return E_NOTIMPL;
 	}
 
-	HRESULT SingleFontCollectionLoader::CreateEnumeratorFromKey(IDWriteFactory * factory, void const * collectionKey, UINT32 collectionKeySize, IDWriteFontFileEnumerator ** fontFileEnumerator)
+	HRESULT SingleFontCollection::SingleFontCollectionLoader::CreateEnumeratorFromKey(IDWriteFactory *factory, void const *collectionKey, UINT32 collectionKeySize, IDWriteFontFileEnumerator ** fontFileEnumerator)
 	{
-		FirstMove = TRUE;
-		*fontFileEnumerator = this;
-		AddRef();
-		return S_OK;
-	}
-
-	HRESULT SingleFontCollectionLoader::GetCurrentFontFile(IDWriteFontFile ** fFile)
-	{
-		*fFile = FontFile;
-		if (!FontFile) return E_FAIL;
-		FontFile->AddRef();
-		return S_OK;
-	}
-
-	HRESULT SingleFontCollectionLoader::MoveNext(BOOL * hasCurrentFile)
-	{
-		if (FirstMove)
-		{
-			*hasCurrentFile = TRUE;
-			FirstMove = FALSE;
-		}
-		else
-		{
-			*hasCurrentFile = FALSE;
-		}
+		if (!factory || !fontFileEnumerator || !collectionKey) return E_INVALIDARG;
+		if (collectionKeySize != 17) return E_FAIL;
+		if (memcmp(collectionKey, "AWPSOFTGAMEMODULE", 17)) return E_FAIL;
+		*fontFileEnumerator = new SingleFontFileEnumerator(FontFile);
 		return S_OK;
 	}
 
 
-	SingleFontCollection* TextFormatFactory::CreateSingleFontCollection(const WCHAR * Path)
+	SingleFontCollection* TextFormatFactory::createSingleFontCollection(const wchar_t* path)
 	{
-		SingleFontCollectionLoader* Loader = new SingleFontCollectionLoader(pDWriteFactory, Path);
-		SingleFontCollection* result = new SingleFontCollection(Loader, pDWriteFactory);
-		Loader->Release();
+		SingleFontCollection::SingleFontCollectionLoader* loader = new SingleFontCollection::SingleFontCollectionLoader(DWriteFactoryPtr, path);
+		SingleFontCollection* result = new SingleFontCollection(DWriteFactoryPtr, loader);
+		loader->Release();
 		return result;
 	}
 
-	SingleFontCollection * TextFormatFactory::CreateSingleFontCollection(IDWriteFontFile * FontFile)
+	SingleFontCollection* TextFormatFactory::createSingleFontCollection(IDWriteFontFile* fontFile)
 	{
-		SingleFontCollectionLoader* Loader = new SingleFontCollectionLoader(FontFile);
-		SingleFontCollection* result = new SingleFontCollection(Loader, pDWriteFactory);
-		Loader->Release();
+		SingleFontCollection::SingleFontCollectionLoader* loader = new SingleFontCollection::SingleFontCollectionLoader(fontFile);
+		SingleFontCollection* result = new SingleFontCollection(DWriteFactoryPtr, loader);
+		loader->Release();
 		return result;
 	}
-
-	IDWriteTextFormat * TextFormatFactory::CreateTextFormat(const WCHAR * FontName, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight, DWRITE_FONT_STYLE FontStyle, DWRITE_FONT_STRETCH FontStretch)
+	const wchar_t* MainLocalNames[15] =
 	{
-		IDWriteTextFormat *pTextFormat = NULL;
+		LOCALE_NAME_USER_DEFAULT,LOCALE_NAME_SYSTEM_DEFAULT,LOCALE_NAME_INVARIANT,
+		L"zh-cn",L"en-us", L"en-gb",L"zh-hk",L"zh-tw",
+		L"fr-fr",L"es-es", L"de-de",L"ja-jp",L"ko-kr",
+		L"ru-ru",L"ar-sa"
+	};
+	IDWriteTextFormat * TextFormatFactory::createTextFormat(const wchar_t * fontName, float fontSize, DWRITE_FONT_WEIGHT fontWeight, DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch)
+	{
+		IDWriteTextFormat *textFormatPtr = nullptr;
 		HRESULT hr;
-		hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, L"zh-cn", &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, L"en-us", &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_INVARIANT, &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_USER_DEFAULT, &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(FontName, NULL, FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_SYSTEM_DEFAULT, &pTextFormat);
-		return pTextFormat;
+		for(int i = 0; i < 15; i++)
+		{
+			hr = DWriteFactoryPtr->CreateTextFormat(fontName, nullptr, fontWeight, fontStyle, fontStretch, fontSize, MainLocalNames[i], &textFormatPtr);
+			if (SUCCEEDED(hr))return textFormatPtr;
+		}
+		return textFormatPtr;
 	}
 
-	IDWriteTextFormat * TextFormatFactory::CreateTextFormat(SingleFontCollection * SingleFont, FLOAT FontSize, DWRITE_FONT_WEIGHT FontWeight, DWRITE_FONT_STYLE FontStyle, DWRITE_FONT_STRETCH FontStretch)
+	IDWriteTextFormat* TextFormatFactory::createTextFormat(SingleFontCollection * singleFontCollection, float fontSize, DWRITE_FONT_WEIGHT fontWeight, DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch)
 	{
-		IDWriteTextFormat *pTextFormat = NULL;
+		IDWriteTextFormat* textFormatPtr = nullptr;
 		HRESULT hr;
-		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, L"zh-cn", &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, L"en-us", &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_INVARIANT, &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_USER_DEFAULT, &pTextFormat);
-		if (SUCCEEDED(hr))return pTextFormat;
-		hr = pDWriteFactory->CreateTextFormat(SingleFont->GetFontName(), SingleFont->GetFontCollection(), FontWeight, FontStyle, FontStretch, FontSize, LOCALE_NAME_SYSTEM_DEFAULT, &pTextFormat);
-		return pTextFormat;
+		for (int i = 0; i < 15; i++)
+		{
+			hr = DWriteFactoryPtr->CreateTextFormat(singleFontCollection->getFontName(), singleFontCollection->getFontCollection(), 
+				fontWeight, fontStyle, fontStretch, fontSize, MainLocalNames[i], &textFormatPtr);
+			if (SUCCEEDED(hr))return textFormatPtr;
+		}
+		return textFormatPtr;
 	}
 
-	IDWriteFactory * TextFormatFactory::GetWriteFactory()
+	IDWriteFactory * TextFormatFactory::getInnerDWriteFactory()
 	{
-		return pDWriteFactory;
+		return DWriteFactoryPtr;
 	}
 
 	TextFormatFactory::TextFormatFactory()
 	{
-		pDWriteFactory = NULL;
-		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)(&pDWriteFactory));
+		DWriteFactoryPtr = nullptr;
+		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)(&DWriteFactoryPtr));
 		if (FAILED(hr))
 		{
-			MessageBox(NULL, L"Create DWrite Factor Failed!", L"Fatal Error!", MB_ICONERROR);
+			MessageBox(nullptr, L"Create DWrite Factor Failed!", L"Fatal Error!", MB_ICONERROR);
 			exit(0);
 		}
 	}
 
 	TextFormatFactory::~TextFormatFactory()
 	{
-		if (pDWriteFactory) pDWriteFactory->Release();
-		pDWriteFactory = NULL;
+		if (DWriteFactoryPtr) DWriteFactoryPtr->Release();
+		DWriteFactoryPtr = nullptr;
 	}
 
-	SingleFontCollectionLoader::SingleFontCollectionLoader(IDWriteFactory* pDWriteFactory, const WCHAR * Path)
+	SingleFontCollection::SingleFontCollectionLoader::SingleFontCollectionLoader(IDWriteFactory* dWriteFactoryPtr, const wchar_t * path)
 	{
-		HRESULT hr;
-		hr = pDWriteFactory->CreateFontFileReference(Path, NULL, &FontFile);
-		if (FAILED(hr)) FontFile = NULL;
-		FirstMove = TRUE;
+		HRESULT hr = dWriteFactoryPtr->CreateFontFileReference(path, nullptr, &FontFile);
+		if (FAILED(hr)) FontFile = nullptr;
 		Reference = 1;
 	}
 
-	SingleFontCollection::SingleFontCollection(SingleFontCollectionLoader *Loader, IDWriteFactory *pDWriteFactory)
+	SingleFontCollection::SingleFontCollection(IDWriteFactory *dWriteFactoryPtr, SingleFontCollectionLoader* loader)
 	{
 		HRESULT hr;
-		FontCollection = NULL;
-		FontName[0] = L'\0';
-		hr = pDWriteFactory->RegisterFontCollectionLoader(Loader);
+		FontCollection = nullptr;
+		memset(&FontName[0], 0, sizeof(wchar_t) * 256);
+		hr = dWriteFactoryPtr->RegisterFontCollectionLoader(loader);
 		if (FAILED(hr))return;
-		hr = pDWriteFactory->CreateCustomFontCollection(Loader, NULL, 0, &FontCollection);
-		pDWriteFactory->UnregisterFontCollectionLoader(Loader);
+		hr = dWriteFactoryPtr->CreateCustomFontCollection(loader, "AWPSOFTGAMEMODULE", 17, &FontCollection);
+		dWriteFactoryPtr->UnregisterFontCollectionLoader(loader);
 		if (FAILED(hr))return;
-		IDWriteFontFamily *pFontFamily = NULL;
-		IDWriteLocalizedStrings* pFamilyNames = NULL;
-		hr = FontCollection->GetFontFamily(0, &pFontFamily);
+		IDWriteFontFamily *fontFamilyPtr = nullptr;
+		IDWriteLocalizedStrings* familyNamesPtr = nullptr;
+		hr = FontCollection->GetFontFamily(0, &fontFamilyPtr);
 		if (FAILED(hr)) return;
-		hr = pFontFamily->GetFamilyNames(&pFamilyNames);
+		hr = fontFamilyPtr->GetFamilyNames(&familyNamesPtr);
 		if (FAILED(hr))
 		{
-			pFontFamily->Release();
+			fontFamilyPtr->Release();
 			return;
 		}
-		pFamilyNames->GetString(0, FontName, 256);
-		pFamilyNames->Release();
-		pFontFamily->Release();
+		familyNamesPtr->GetString(0, FontName, 512);
+		familyNamesPtr->Release();
+		fontFamilyPtr->Release();
 	}
 
 	SingleFontCollection ::~SingleFontCollection()
 	{
 		if (FontCollection) FontCollection->Release();
-		FontCollection = NULL;
+		FontCollection = nullptr;
 	}
 
-	IDWriteFontCollection * SingleFontCollection::GetFontCollection()
+	IDWriteFontCollection * SingleFontCollection::getFontCollection()
 	{
 		return FontCollection;
 	}
 
-	WCHAR * SingleFontCollection::GetFontName()
+	wchar_t * SingleFontCollection::getFontName()
 	{
 		return FontName;
 	}

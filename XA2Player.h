@@ -6,19 +6,19 @@ namespace AwpSoftGameModule
 	class XA2PlayerMaster
 	{
 	private:
-		INT32 Reference;
-		BOOL Enable;
+		int Reference;
+		bool Enable;
 		IXAudio2 *XA2;
 		IXAudio2MasteringVoice *XA2Master;
 		~XA2PlayerMaster();
 	public:
-		void AddRef();
-		void Release();
 		XA2PlayerMaster();
-		void SetVolume(FLOAT rate = 1.0f);
-		FLOAT GetVolume();
-		BOOL IsEnable();
-		IXAudio2* GetXAudio2Ptr();
+		void addRef();
+		void release();
+		void setVolume(float volume = 1.0f);
+		float getVolume();
+		bool enable();
+		IXAudio2* getInnerXAudio2Ptr();
 	};
 	class XA2Player
 	{
@@ -27,22 +27,22 @@ namespace AwpSoftGameModule
 		IXAudio2SourceVoice *SourcePoster;
 		XAUDIO2_BUFFER LastBuffer;
 		WAVEFORMATEX OriginFormat[4]; //Can Enlarge
-		BOOL Enable;
+		bool Enable;
 	public:
-		XA2Player(XA2PlayerMaster* master, WAVEFORMATEX* inputFormat = NULL);
+		XA2Player(XA2PlayerMaster* master, WAVEFORMATEX* inputFormat = nullptr);
 		virtual ~XA2Player();
-		BOOL IsEnable();
-		BOOL IsSafeToRelease();
-		void Play(XAUDIO2_BUFFER * xa2Buffer,BOOL resetIfNotChange = TRUE);
-		void Play(BYTE* startAddress,UINT32 endSize, BOOL resetIfNoChange = TRUE,BOOL loop = FALSE,UINT32 loopStartOffset = 0,UINT32 loopEndOffset = 0xFFFFFFFF);
-		void Replay();
-		void Stop();
-		void Pause();
-		void Continue();
-		void SetVolume(FLOAT rate = 1.0f);
-		FLOAT GetVolume();
-		void SetFreqRate(FLOAT rate = 1.0f);
-		FLOAT GetFreqRate();
-		void SetInputSampleRate(UINT sampleRate = 0);
+		bool enable();
+		bool isSafeToReleasePostedBuffers();
+		void play(XAUDIO2_BUFFER * xa2Buffer,bool resetIfNotChange = true);
+		void play(unsigned char* startAddress,unsigned int endSize, bool resetIfNoChange = true,bool loop = false,unsigned int loopStartOffset = 0,unsigned int loopEndOffset = 0xFFFFFFFF);
+		void replay();
+		void stop();
+		void pause();
+		void continuePlay();
+		void setVolume(float volume = 1.0f);
+		float getVolume();
+		void setFreqRate(float rate = 1.0f);
+		float getFreqRate();
+		void setInputSampleRate(unsigned int sampleRate = 0);
 	};
 };

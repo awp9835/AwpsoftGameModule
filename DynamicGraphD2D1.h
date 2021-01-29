@@ -1,28 +1,28 @@
 #pragma once
 #include "GameObject2D.h"
-
+#include "vector"
 namespace AwpSoftGameModule
 {
 	class DynamicGraphs :TimeVariantObject
 	{
 	protected:
-		ImagesClipD2D1 ThisClip;
-		INT32 CurrentFrame;
-		FLOAT SwitchSpeed, Remnant;
-		BOOL Loop;
+		bool Loop;
+		int CurrentPos;
+		float SwitchSpeed, Remnant;
+		std::vector<ID2D1Bitmap*> ThisClip;
 	public:
 		DynamicGraphs();
-		DynamicGraphs(ImagesClipD2D1 Clip);
+		DynamicGraphs(std::vector<ID2D1Bitmap*> clip);
 		virtual ~DynamicGraphs();
-		void SetThisClip(ImagesClipD2D1 Clip);
-		void SetSwitchPara(FLOAT Speed, BOOL EnableReplay);
-		void SetSwitchSpeed(FLOAT Speed);
-		void SetEnableLoop(BOOL EnableLoop);
-		void ResetCurrentFrame();
-		ID2D1Bitmap* GetCurrentFrame();
-		ID2D1Bitmap* GetLastFrame();
-		ID2D1Bitmap* GetFirstFrame();
-		ID2D1Bitmap* GetFrame(INT32 Index);
-		virtual BOOL GiveTime(INT32 TimeGived);
+		void setClip(std::vector<ID2D1Bitmap*> clip, bool resetPos = true);
+		void setSwitchParams(float speed, bool enableLoop);
+		void setSwitchSpeed(float speed);
+		void setEnableLoop(bool enableLoop = false);
+		void resetCurrentPos();
+		ID2D1Bitmap* getCurrentFrame();
+		ID2D1Bitmap* getLastFrame();
+		ID2D1Bitmap* getFirstFrame();
+		ID2D1Bitmap* getFrame(int index);
+		virtual bool giveTime(int timeGived);
 	};
 };
