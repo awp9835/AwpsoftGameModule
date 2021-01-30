@@ -160,7 +160,7 @@ namespace AwpSoftGameModule
 		return false;
 	}
 
-	void D2D1DrawFactory::setDPI(float dpi)
+	void D2D1DrawFactory::setDpi(float dpi)
 	{
 		RenderTargetPtr->SetDpi(dpi, dpi);
 	}

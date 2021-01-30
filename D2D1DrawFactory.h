@@ -57,7 +57,7 @@ namespace AwpSoftGameModule
 		void drawTextStep(TextParametersD2D1 textPara, bool resetTransform);
 		void beginDraw();
 		bool endDraw();
-		void setDPI(float dpi = 96.0f);
+		void setDpi(float dpi = 96.0f);
 		bool changeMaxFps(int maxfps);
 		ID2D1HwndRenderTarget* getInnerHwndRenderTarget();
 		ID2D1Bitmap* createImageFromMemoryBMP(unsigned char* buffer, unsigned int size);
