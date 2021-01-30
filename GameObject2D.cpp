@@ -109,6 +109,10 @@ namespace AwpSoftGameModule
 		{
 			timeGived = (int)MoveTimeRemain;
 		}
+		else if (MoveTimeRemain == 0)
+		{
+			return true;
+		}
 		MoveTimeRemain -= timeGived;
 		PosCenterX += VelocityX * timeGived + AccelerX * (float)timeGived * (float)timeGived / 2.0f;
 		PosCenterY += VelocityY * timeGived + AccelerY * (float)timeGived * (float)timeGived / 2.0f;

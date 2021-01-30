@@ -41,29 +41,23 @@ namespace AwpSoftGameModule
 	class D2D1DrawFactory :protected D2D1Created
 	{
 	protected:
-		bool VerticalSync;
-		int MaxFps;
-		volatile std::atomic<bool> WaitNextFrame;
-		volatile std::atomic<int> ThreadState;
+		int FrequencyDivide;
 		ID2D1HwndRenderTarget* RenderTargetPtr;
 		IWICImagingFactory* ImageFactoryPtr;
 		ID2D1Bitmap* createImageFromMemory(IWICBitmapDecoder* decorderPtr, unsigned char* buffer, unsigned int size);
-		static void __cdecl FpsLimitThread(void* _thisPtr);
 	public:
 		D2D1DrawFactory(HWND hwnd, unsigned int width = 1280 , unsigned int height = 720);
-		D2D1DrawFactory(int maxfps, HWND hwnd, unsigned int width = 1280, unsigned int height = 720);
 		virtual ~D2D1DrawFactory();
 		void drawStep(DrawParametersD2D1 drawPara);
 		void drawTextStep(TextParametersD2D1 textPara, bool resetTransform);
 		void beginDraw();
 		bool endDraw();
 		void setDpi(float dpi = 96.0f);
-		bool changeMaxFps(int maxfps);
+		void setFrequencyDivide(int divide = 1);
 		ID2D1HwndRenderTarget* getInnerHwndRenderTarget();
 		ID2D1Bitmap* createImageFromMemoryBMP(unsigned char* buffer, unsigned int size);
 		ID2D1Bitmap* createImageFromMemoryJPG(unsigned char* buffer, unsigned int size);
 		ID2D1Bitmap* createImageFromMemoryPNG(unsigned char* buffer, unsigned int size);
 		std::vector<ID2D1Bitmap*> createMultipleImagesFromMemoryGIF(unsigned char* buffer, unsigned int size);
-		virtual void sleepMicroSeconds(int microSeconds);
 	};
 };

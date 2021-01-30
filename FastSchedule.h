@@ -82,9 +82,9 @@ namespace AwpSoftGameModule
 		for (int i = 1; i <= Length; i++)
 		{
 			gotoNextPos();
-			if (currentElementIsNull())return Pos;
+			if (ScheduleList[Pos] == nullptr) return Pos;
 		}
-		return 0xFFFFFFFF;
+		return -1;
 	}
 
 	template<class T>
@@ -125,6 +125,7 @@ namespace AwpSoftGameModule
 		if (!ptr) return Pos;
 		Occupied++;
 		ScheduleList[Pos] = ptr;
+		gotoNextNullPos();
 		return Pos;
 	}
 

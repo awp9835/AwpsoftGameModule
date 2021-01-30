@@ -27,10 +27,7 @@ namespace AwpSoftGameModule
 		HRESULT hr;
 		RenderTargetPtr = nullptr;
 		ImageFactoryPtr = nullptr;
-		VerticalSync = true;
-		WaitNextFrame = false;
-		ThreadState = 10;
-		MaxFps = 0;
+		FrequencyDivide = 1;
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&ImageFactoryPtr);
 		if (FAILED(hr))
@@ -52,57 +49,12 @@ namespace AwpSoftGameModule
 		}
 	}
 
-	D2D1DrawFactory::D2D1DrawFactory(int maxfps, HWND hwnd, unsigned int width, unsigned int height)
-	{
-		HRESULT hr;
-		RenderTargetPtr = nullptr;
-		ImageFactoryPtr = nullptr;
-		VerticalSync = false;
-		WaitNextFrame = false;
-		ThreadState = 0;
-		if (maxfps < 0) maxfps = 0;
-		MaxFps = maxfps;
-		CoInitializeEx(NULL, COINIT_MULTITHREADED);
-		hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&ImageFactoryPtr);
-		if (FAILED(hr))
-		{
-			MessageBox(NULL, L"Create Image Factory Failed!", L"Fatal Error!", MB_ICONERROR);
-			exit(0);
-		}
-
-		hr = FactoryPtr->CreateHwndRenderTarget
-		(
-			D2D1::RenderTargetProperties(),
-			D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(width, height), D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS),
-			&RenderTargetPtr
-		);
-		if (FAILED(hr))
-		{
-			MessageBox(NULL, L"Create Render Target Failed!", L"Fatal Error!", MB_ICONERROR);
-			exit(0);
-		}
-		ThreadState = 0;
-		if (_beginthread(&FpsLimitThread, 0, (void*)this) != -1)
-		{
-			ThreadState = 1;
-		}
-		else
-		{
-			VerticalSync = true; //no effect, only for mask
-			MessageBox(NULL, L"Create FPS Limit Thread Failed!", L"Warning!", MB_ICONWARNING);
-		}
-	}
-
 	D2D1DrawFactory::~D2D1DrawFactory()
 	{
 		if (RenderTargetPtr) RenderTargetPtr->Release();
 		RenderTargetPtr = nullptr;
 		if (ImageFactoryPtr) ImageFactoryPtr->Release();
 		ImageFactoryPtr = nullptr;
-		if (VerticalSync) return;
-		while (ThreadState == 1) std::this_thread::yield();
-		ThreadState = 3;
-		while (ThreadState == 3) std::this_thread::yield();
 	}
 
 	void D2D1DrawFactory::drawStep(DrawParametersD2D1 drawPara)
@@ -150,14 +102,14 @@ namespace AwpSoftGameModule
 
 	bool D2D1DrawFactory::endDraw()
 	{
-		if (!VerticalSync)
+		for (int i = 1; i < FrequencyDivide; i++)
 		{
-			while (WaitNextFrame) std::this_thread::yield();
-			WaitNextFrame = true;
+			RenderTargetPtr->EndDraw();
+			RenderTargetPtr->BeginDraw();
 		}
 		HRESULT hr = RenderTargetPtr->EndDraw();
-		if (SUCCEEDED(hr)) return true;
-		return false;
+		if (FAILED(hr)) return false;
+		return true;
 	}
 
 	void D2D1DrawFactory::setDpi(float dpi)
@@ -165,27 +117,11 @@ namespace AwpSoftGameModule
 		RenderTargetPtr->SetDpi(dpi, dpi);
 	}
 
-	bool D2D1DrawFactory::changeMaxFps(int maxfps)
+	void D2D1DrawFactory::setFrequencyDivide(int divide)
 	{
-		if (VerticalSync) return false;
-		if (maxfps < 0) return false;
-		while (ThreadState == 1) std::this_thread::yield();
-		ThreadState = 3;
-		while (ThreadState == 3) std::this_thread::yield();
-		MaxFps = maxfps;
-		ThreadState = 0;
-		if (_beginthread(&FpsLimitThread, 0, (void*)this) != -1)
-		{
-			ThreadState = 1;
-			return true;
-		}
-		else
-		{
-			VerticalSync = true; //no effect, only for mask
-			MessageBox(NULL, L"Create FPS Limit Thread Failed!", L"Warning!", MB_ICONWARNING);
-			return false;
-		}
+		FrequencyDivide = divide;
 	}
+
 
 	ID2D1HwndRenderTarget* D2D1DrawFactory::getInnerHwndRenderTarget()
 	{
@@ -233,43 +169,6 @@ namespace AwpSoftGameModule
 		source->Release();
 		if (FAILED(hr)) return nullptr;
 		return bitmap;
-	}
-	void __cdecl D2D1DrawFactory::FpsLimitThread(void* _thisPtr)
-	{
-		D2D1DrawFactory* thisPtr = (D2D1DrawFactory*)_thisPtr;
-		while (thisPtr->ThreadState == 0) std::this_thread::yield();
-		thisPtr->ThreadState = 2;
-		bool nolimit = (thisPtr->MaxFps <= 0);
-		int rmf = thisPtr->MaxFps; 
-		int rmt = 1000;
-		int expect = rmt / rmf; //[0, 1000]
-		while (thisPtr->ThreadState == 2)
-		{
-			if (nolimit)
-			{
-				std::this_thread::yield();
-				thisPtr->WaitNextFrame = false;
-				continue;
-			}
-			thisPtr->sleepMicroSeconds(expect * 1000);
-			thisPtr->WaitNextFrame = false;
-			rmf -= 1;
-			rmt -= expect;
-			if (rmf == 0)
-			{
-				rmf += thisPtr->MaxFps;
-				rmt += 1000;
-			}
-			if (rmt <= 0)
-			{
-				expect = 0;
-			}
-			else
-			{
-				expect = rmt / rmf;
-			}
-		}
-		thisPtr->ThreadState = 4;
 	}
 	ID2D1Bitmap* D2D1DrawFactory::createImageFromMemoryBMP(unsigned char* buffer, unsigned int size)
 	{
@@ -361,13 +260,6 @@ namespace AwpSoftGameModule
 		decoder->Release();
 		source->Release();
 		return std::move(bitmaps);
-	}
-
-	void D2D1DrawFactory::sleepMicroSeconds(int microSeconds)
-	{
-		if (microSeconds < 0) return;
-		if (microSeconds < 1000 && microSeconds >= 100) microSeconds = 1000;
-		Sleep(microSeconds / 1000);
 	}
 
 	DrawParametersD2D1::DrawParametersD2D1()
