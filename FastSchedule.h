@@ -40,7 +40,7 @@ namespace AwpSoftGameModule
 	template<class T>
 	inline FastSchedule<T>::~FastSchedule()
 	{
-		if (!ScheduleList.empty()) clearAllField();
+		if (!ScheduleList.empty()) clearAll();
 	}
 
 	template<class T>
@@ -107,7 +107,7 @@ namespace AwpSoftGameModule
 	template<class T>
 	inline void FastSchedule<T>::clearAll()
 	{
-		for ((T*)& r : ScheduleList)
+		for (T*& r : ScheduleList)
 		{
 			if (r) delete r;
 			r = nullptr;
