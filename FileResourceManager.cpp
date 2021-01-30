@@ -22,7 +22,7 @@ namespace AwpSoftGameModule
 
 	int FileResourceManager::takeOverFileResource(FileResourceInfo fileInfo)
 	{
-		if (fileInfo.FileID >= FileList.size() || fileInfo.FileID < 0) return -1;
+		if (fileInfo.FileID >= (int)FileList.size() || fileInfo.FileID < 0) return -1;
 		if (FileList[fileInfo.FileID].Buffer)
 		{
 			delete[] FileList[fileInfo.FileID].Buffer;
@@ -34,7 +34,7 @@ namespace AwpSoftGameModule
 
 	FileResourceInfo FileResourceManager::getFileResourceInfo(int fileID)
 	{
-		if (fileID >= FileList.size() || fileID < 0)
+		if (fileID >= (int)FileList.size() || fileID < 0)
 		{
 			return FileResourceInfo();
 		}
@@ -46,7 +46,7 @@ namespace AwpSoftGameModule
 
 	FileResourceInfo FileResourceManager::takeOutFileResource(int fileID)
 	{
-		if (fileID >= FileList.size() || fileID < 0)
+		if (fileID >= (int)FileList.size() || fileID < 0)
 		{
 			return FileResourceInfo();
 		}
@@ -60,7 +60,7 @@ namespace AwpSoftGameModule
 
 	unsigned int FileResourceManager::loadFile(const wchar_t * fileName, int fileID, unsigned int fileType, float param1, float param2)
 	{
-		if (fileID >= FileList.size() || fileID < 0) return 0;
+		if (fileID >= (int)FileList.size() || fileID < 0) return 0;
 		FileResourceInfo fri;
 		FILE* fp = _wfopen(fileName, L"rb");
 		if (!fp) return 0;
@@ -89,7 +89,7 @@ namespace AwpSoftGameModule
 
 	unsigned int FileResourceManager::releaseFileResource(int fileID)
 	{
-		if (fileID >= FileList.size() || fileID < 0) return 0;
+		if (fileID >= (int)FileList.size() || fileID < 0) return 0;
 		if (FileList[fileID].Buffer) delete[] FileList[fileID].Buffer;
 		unsigned int ts = FileList[fileID].Size;
 		FileList[fileID] = std::move(FileResourceInfo());
@@ -136,7 +136,7 @@ namespace AwpSoftGameModule
 			fread(&frp.Param2, sizeof(frp.Param2), 1, fp);
 			fread(&frp.Size, sizeof(frp.Size), 1, fp);
 			fsize -= sizeof(frp.FileID) + sizeof(frp.Type) + sizeof(frp.Param1) + sizeof(frp.Param2) + sizeof(frp.Size);
-			if (frp.FileID >= FileList.size() || frp.FileID < 0)
+			if (frp.FileID >= (int)FileList.size() || frp.FileID < 0)
 			{
 				fsize -= frp.Size;
 				fseek(fp, frp.Size, SEEK_CUR);
@@ -189,7 +189,7 @@ namespace AwpSoftGameModule
 			fread(&frp.Param2, sizeof(frp.Param2), 1, fp);
 			fread(&frp.Size, sizeof(frp.Size), 1, fp);
 			fsize -= sizeof(frp.FileID) + sizeof(frp.Type) + sizeof(frp.Param1) + sizeof(frp.Param2) + sizeof(frp.Size);
-			if (frp.FileID < minFileID || frp.FileID > maxFileID || frp.FileID >= FileList.size() || frp.FileID < 0)
+			if (frp.FileID < minFileID || frp.FileID > maxFileID || frp.FileID >= (int)FileList.size() || frp.FileID < 0)
 			{
 				fsize -= frp.Size;
 				fseek(fp, frp.Size, SEEK_CUR);
@@ -219,7 +219,7 @@ namespace AwpSoftGameModule
 
 	unsigned int FileResourceManager::loadSingleFileFromPackage(const wchar_t * packageFileName, int fileID)
 	{
-		if (fileID >= FileList.size() || fileID < 0) return 0;
+		if (fileID >= (int)FileList.size() || fileID < 0) return 0;
 		FileResourceInfo frp;
 		FILE* fp = _wfopen(packageFileName, L"rb");
 		if (!fp) return 0;
@@ -287,7 +287,7 @@ namespace AwpSoftGameModule
 		for (FileResourceInfo& finfo: FileList)
 		{
 			if (finfo.FileID < 0) continue;
-			if (fwrite(finfo.Buffer, 1, finfo.Size, pfp) != finfo.Size)
+			if ((int)fwrite(finfo.Buffer, 1, finfo.Size, pfp) != finfo.Size)
 			{
 				printf("IO异常，写入到Package文件失败。\n");
 				break;
@@ -361,7 +361,7 @@ namespace AwpSoftGameModule
 				fwrite(&p1, sizeof(p1), 1, pfp);
 				fwrite(&p2, sizeof(p2), 1, pfp);
 				fwrite(&fsize, sizeof(fsize), 1, pfp);
-				if (fread(buffer, 1, fsize, ffp) != fsize)
+				if ((int)fread(buffer, 1, fsize, ffp) != fsize)
 				{
 					fclose(ffp);
 					delete[] buffer;
@@ -369,7 +369,7 @@ namespace AwpSoftGameModule
 					continue;
 				}
 				fclose(ffp);
-				if (fwrite(buffer, 1, fsize, pfp) != fsize)
+				if ((int)fwrite(buffer, 1, fsize, pfp) != fsize)
 				{
 					delete[] buffer;
 					printf("IO异常，写入到Package文件失败！\n");

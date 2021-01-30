@@ -11,41 +11,41 @@ namespace AwpSoftGameModule
 	{
 	}
 
-	void FunctionToKey::SetKeysOfFunction(int FunctionIndex, unsigned char Key1, unsigned char Key2, unsigned char Key3, unsigned char Key4)
+	void FunctionToKey::setKeysOfFunction(int functionIndex, unsigned char key1, unsigned char key2, unsigned char key3, unsigned char key4)
 	{
 
-		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
+		if (functionIndex < 0x0 || functionIndex >= 0x100)
 		{
 			return;
 		}
 
-		unsigned int temp = Key4;
+		unsigned int temp = key4;
 		temp <<= 8;
-		temp |= Key3;
+		temp |= key3;
 		temp <<= 8;
-		temp |= Key2;
+		temp |= key2;
 		temp <<= 8;
-		temp |= Key1;
-		KeysOfFunction[FunctionIndex] = temp;
+		temp |= key1;
+		KeysOfFunction[functionIndex] = temp;
 	}
 
-	unsigned int FunctionToKey::GetKeysOfFunction(int FunctionIndex)
+	unsigned int FunctionToKey::getKeysOfFunction(int functionIndex)
 	{
-		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
+		if (functionIndex < 0x0 || functionIndex >= 0x100)
 		{
 			return 0x0;
 		}
 
-		return KeysOfFunction[FunctionIndex];
+		return KeysOfFunction[functionIndex];
 	}
 
-	bool FunctionToKey::GetFunctionState(int FunctionIndex)
+	bool FunctionToKey::getFunctionState(int functionIndex)
 	{
-		if (FunctionIndex < 0x0 || FunctionIndex >= 0x100)
+		if (functionIndex < 0x0 || functionIndex >= 0x100)
 		{
 			return false;
 		}
-		unsigned int temp = KeysOfFunction[FunctionIndex];
+		unsigned int temp = KeysOfFunction[functionIndex];
 		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
 		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;

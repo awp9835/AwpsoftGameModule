@@ -10,8 +10,8 @@ namespace AwpSoftGameModule
 		FunctionToKey();
 		//Your Set At This
 		virtual ~FunctionToKey();
-		void SetKeysOfFunction(int FunctionIndex, unsigned char Key1, unsigned char Key2 = 0x00, unsigned char Key3 = 0x00, unsigned char Key4 = 0x00);
-		unsigned int GetKeysOfFunction(int FunctionIndex);
-		bool GetFunctionState(int FunctionIndex);
+		void setKeysOfFunction(int functionIndex, unsigned char key1, unsigned char key2 = 0x00, unsigned char key3 = 0x00, unsigned char key4 = 0x00);
+		unsigned int getKeysOfFunction(int functionIndex);
+		bool getFunctionState(int functionIndex);
 	};
 }

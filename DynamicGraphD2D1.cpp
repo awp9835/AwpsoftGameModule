@@ -37,7 +37,7 @@ namespace AwpSoftGameModule
 		{
 			CurrentPos %= clip.size();
 		}
-		else if (CurrentPos > clip.size())
+		else if (CurrentPos > (int)clip.size())
 		{
 			CurrentPos = (int)clip.size() - 1;
 		}
@@ -87,7 +87,7 @@ namespace AwpSoftGameModule
 	ID2D1Bitmap * DynamicGraphs::getFrame(int index)
 	{
 		if (ThisClip.empty()) return nullptr;
-		else if (index >= ThisClip.size()) return ThisClip[ThisClip.size() - 1];
+		else if (index >= (int)ThisClip.size()) return ThisClip[ThisClip.size() - 1];
 		else if (index < 0) return ThisClip[0];
 		else return ThisClip[index];
 	}
@@ -98,7 +98,7 @@ namespace AwpSoftGameModule
 		else if (SwitchSpeed == 0.0f) return true;
 		else if (!Loop)
 		{
-			if (SwitchSpeed > 0.0f && CurrentPos == ThisClip.size() - 1)return true;
+			if (SwitchSpeed > 0.0f && CurrentPos == (int)ThisClip.size() - 1)return true;
 			if (SwitchSpeed < 0.0f && CurrentPos == 0)return true;
 		}
 		float temp1;
@@ -119,7 +119,7 @@ namespace AwpSoftGameModule
 			return true;
 		}
 		if (temp2 < 0) temp2 = 0;
-		if (temp2 >= ThisClip.size()) temp2 = (int)ThisClip.size() - 1;
+		if (temp2 >= (int)ThisClip.size()) temp2 = (int)ThisClip.size() - 1;
 		if (temp2 < 0) temp2 = 0;
 		CurrentPos = temp2;
 		return true;
