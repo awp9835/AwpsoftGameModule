@@ -36,7 +36,7 @@ namespace AwpSoftGameModule
 		unsigned int getUnitAttribute(unsigned short index, unsigned short secondaryIndex = 0);
 		unsigned short getCurrentSelectIndex();
 		unsigned short getCurrentSelectSecondaryIndex();
-		void SetCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex = 0);
+		void setCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex = 0);
 		unsigned int getCurrentSelectAttribute();
 		unsigned int up();
 		unsigned int down();

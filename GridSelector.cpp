@@ -201,7 +201,7 @@ namespace AwpSoftGameModule
 	{
 		return (unsigned short)((CurrentSelect & 0xFFFF0000) >> 16);
 	}
-	void GridSelector::SetCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex)
+	void GridSelector::setCurrentSelectIndex(unsigned short index, unsigned short secondaryIndex)
 	{
 		index = (unsigned short)min((unsigned int)index, PKinds - 1);
 		secondaryIndex = (unsigned short)min((unsigned int)secondaryIndex, SKinds - 1);
