@@ -61,7 +61,7 @@ namespace AwpSoftGameModule
 		XA2Master->GetVolume(&result);
 		return result;
 	}
-	bool XA2PlayerMaster::enable()
+	bool XA2PlayerMaster::isEnable()
 	{
 		return Enable;
 	}
@@ -148,7 +148,7 @@ namespace AwpSoftGameModule
 		SourcePoster = nullptr;
 		memset(&LastBuffer, 0, sizeof(XAUDIO2_BUFFER));
 		if (!master) return;
-		if (!master->enable()) return;
+		if (!master->isEnable()) return;
 
 		if (!inputFormat)
 		{
@@ -186,7 +186,7 @@ namespace AwpSoftGameModule
 			Master = nullptr;
 		}
 	}
-	bool XA2Player::enable()
+	bool XA2Player::isEnable()
 	{
 		return Enable;
 	}

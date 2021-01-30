@@ -57,7 +57,7 @@ namespace AwpSoftGameModule
 		TextBoxD2D1();
 		virtual ~TextBoxD2D1();
 		void skipTyping();
-		bool typingComplete();
+		bool isTypingComplete();
 		void setText(wchar_t* wstr);
 		virtual void reset();
 		virtual bool giveTime(int timeGived);

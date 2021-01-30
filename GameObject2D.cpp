@@ -175,7 +175,7 @@ namespace AwpSoftGameModule
 		TypedLength = (float)StrLength;
 	}
 
-	bool TextBoxD2D1::typingComplete()
+	bool TextBoxD2D1::isTypingComplete()
 	{
 		if (TypedLength + 0.5 >= (float)StrLength) return true;
 		else return false;
@@ -209,7 +209,7 @@ namespace AwpSoftGameModule
 		temp.XLeft = UseRelativePos ? (TextLeftX + PosCenterX) : TextLeftX;
 		temp.XRight = UseRelativePos ? (TextRightX + PosCenterX) : TextRightX;
 		temp.YTop = UseRelativePos ? (TextTopY + PosCenterY) : TextTopY;
-		temp.StrLength = (!TypingMode || typingComplete()) ? StrLength : (max(0, (int)(TypedLength + 0.5)));
+		temp.StrLength = (!TypingMode || isTypingComplete()) ? StrLength : (max(0, (int)(TypedLength + 0.5)));
 		return temp;
 	}
 
