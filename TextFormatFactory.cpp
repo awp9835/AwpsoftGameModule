@@ -144,9 +144,9 @@ namespace AwpSoftGameModule
 		loader->Release();
 		return result;
 	}
-	const wchar_t* MainLocalNames[15] =
+	const wchar_t* MainLocalNames[13] =
 	{
-		LOCALE_NAME_USER_DEFAULT,LOCALE_NAME_SYSTEM_DEFAULT,LOCALE_NAME_INVARIANT,
+		LOCALE_NAME_INVARIANT,
 		L"zh-cn",L"en-us", L"en-gb",L"zh-hk",L"zh-tw",
 		L"fr-fr",L"es-es", L"de-de",L"ja-jp",L"ko-kr",
 		L"ru-ru",L"ar-sa"
@@ -155,7 +155,7 @@ namespace AwpSoftGameModule
 	{
 		IDWriteTextFormat *textFormatPtr = nullptr;
 		HRESULT hr;
-		for(int i = 0; i < 15; i++)
+		for(int i = 0; i < 13; i++)
 		{
 			hr = DWriteFactoryPtr->CreateTextFormat(fontName, nullptr, fontWeight, fontStyle, fontStretch, fontSize, MainLocalNames[i], &textFormatPtr);
 			if (SUCCEEDED(hr))return textFormatPtr;
@@ -167,7 +167,7 @@ namespace AwpSoftGameModule
 	{
 		IDWriteTextFormat* textFormatPtr = nullptr;
 		HRESULT hr;
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < 13; i++)
 		{
 			hr = DWriteFactoryPtr->CreateTextFormat(singleFontCollection->getFontName(), singleFontCollection->getFontCollection(), 
 				fontWeight, fontStyle, fontStretch, fontSize, MainLocalNames[i], &textFormatPtr);
