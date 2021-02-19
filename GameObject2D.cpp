@@ -220,7 +220,15 @@ namespace AwpSoftGameModule
 	void TextBoxD2D1::draw(D2D1DrawFactory * DrawFactory)
 	{
 		if (!Enable || !Visible) return;
-		DrawFactory->drawStep(getDrawParameters());
-		DrawFactory->drawTextStep(getTextParameters(), !BoundTrasnform);
+		if (BoundTrasnform)
+		{
+			DrawFactory->drawStep(getDrawParameters(), true);
+			DrawFactory->drawStep(getDrawParameters(), false);
+		}
+		else
+		{
+			DrawFactory->drawStep(getDrawParameters(), false);
+			DrawFactory->drawTextStep(getTextParameters(), true);
+		}
 	}
 };

@@ -57,27 +57,28 @@ namespace AwpSoftGameModule
 		ImageFactoryPtr = nullptr;
 	}
 
-	void D2D1DrawFactory::drawStep(DrawParametersD2D1 drawPara)
+	void D2D1DrawFactory::drawStep(DrawParametersD2D1 drawPara, bool forceTransform)
 	{
-		if (!drawPara.Image) return;
-		D2D1::Matrix3x2F transform = D2D1::Matrix3x2F::Identity();
+		if (forceTransform || (drawPara.Visible && drawPara.Image != nullptr))
+		{
+			D2D1::Matrix3x2F transform = D2D1::Matrix3x2F::Identity();
+			if (drawPara.HScale != 1.0f || drawPara.WScale != 1.0f)
+			{
+				transform = transform * D2D1::Matrix3x2F::Scale(drawPara.WScale, drawPara.HScale, D2D1::Point2F(drawPara.PosCenterX, drawPara.PosCenterY));
+			}
+			if (drawPara.RotationDEG != 0.0f)
+			{
+				transform = transform * D2D1::Matrix3x2F::Rotation(drawPara.RotationDEG, D2D1::Point2F(drawPara.PosCenterX, drawPara.PosCenterY));
+			}
+			RenderTargetPtr->SetTransform(transform);
+		}
+		if (!drawPara.Visible || drawPara.Image == nullptr) return;
+		D2D1_SIZE_F imageSize = drawPara.Image->GetSize();
 		float leftTopX = drawPara.PosCenterX - drawPara.PicCenterX;
 		float leftTopY = drawPara.PosCenterY - drawPara.PicCenterY;
-		D2D1_SIZE_F imageSize = drawPara.Image->GetSize();
-		if (!drawPara.Visible) return;
-
-		if (drawPara.HScale != 1.0f || drawPara.WScale != 1.0f)
-		{
-			transform = transform * D2D1::Matrix3x2F::Scale(drawPara.WScale, drawPara.HScale, D2D1::Point2F(drawPara.PosCenterX, drawPara.PosCenterY));
-		}
-		if (drawPara.RotationDEG != 0.0f)
-		{
-			transform = transform * D2D1::Matrix3x2F::Rotation(drawPara.RotationDEG, D2D1::Point2F(drawPara.PosCenterX, drawPara.PosCenterY));
-		}
-		RenderTargetPtr->SetTransform(transform);
 		RenderTargetPtr->DrawBitmap(drawPara.Image, D2D1::RectF(leftTopX, leftTopY, leftTopX + imageSize.width, leftTopY + imageSize.height), drawPara.SecondaryAlpha, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, nullptr);
 	}
-	void D2D1DrawFactory::drawTextStep(TextParametersD2D1 textPara, bool resetTransform = true)
+	void D2D1DrawFactory::drawTextStep(TextParametersD2D1 textPara, bool resetTransform)
 	{
 
 		if (!textPara.Visible) return;

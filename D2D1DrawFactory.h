@@ -48,8 +48,8 @@ namespace AwpSoftGameModule
 	public:
 		D2D1DrawFactory(HWND hwnd, unsigned int width = 1280 , unsigned int height = 720);
 		virtual ~D2D1DrawFactory();
-		void drawStep(DrawParametersD2D1 drawPara);
-		void drawTextStep(TextParametersD2D1 textPara, bool resetTransform);
+		void drawStep(DrawParametersD2D1 drawPara, bool forceTransform = false);
+		void drawTextStep(TextParametersD2D1 textPara, bool resetTransform = true);
 		void beginDraw();
 		bool endDraw();
 		void setDpi(float dpi = 96.0f);
