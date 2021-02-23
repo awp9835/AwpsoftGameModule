@@ -103,16 +103,17 @@ const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.30
 # CallbackTree.h #
 
 **void EnterStdcallCallbackTree(StdcallCallbackTreeFunctionAddress root, void *  sharedParamsAddress);**  
-*回调函数类型为 ```void*  __cdecl function(void *);```*   
+*回调函数类型为 ```void*  __stdcall function(void *);```*   
 **void EnterCdeclCallbackTree(CdeclCallbackTreeFunctionAddress root, void *  sharedParamsAddress);**  
-*回调函数类型为 ```void*  __stdcall function(void  *);```*   
-注意：调用约定和函数类型必须匹配！
-CallbackTree流程控制函数，对不同的调用约定应分别使用对应的函数，例如：
+*回调函数类型为 ```void*  __cdecl function(void  *);```*   
+注意：调用约定和函数类型必须匹配！  
+CallbackTree使用返回值控制流程，对不同的调用约定应分别使用对应的函数。  
+使用方法例如：
 ```
 #include <iostream>
 #include <cstdio>
-#using namespace std;
-#char PARAM[80] = "锟斤拷烫烫烫";
+using namespace std;
+char PARAM[80] = "锟斤拷烫烫烫";
 void* __cdecl MsnekoSaid(void* param)
 {
 	cout<<"msneko：实用主义者都是无头苍蝇。"<<endl;
@@ -123,6 +124,7 @@ void* __cdecl AwpsoftSaid(void*)
 {
 	cout<<"awpsoft：学院派都是瓜。"<<endl;
 	return MsnekoSaid; //接下来调用MsnekoSaid
+	//如果Compile Error，改为 return (void*)MsnekoSaid;
 }
 int main()
 {
