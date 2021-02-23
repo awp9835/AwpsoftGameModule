@@ -69,8 +69,8 @@ while(true)
 **extern const float PentagramY[6];**
 外接圆半径为五角星的中心和五个点坐标。
 ```
-	const float PentagramX[6] = { 0.0f,0.0f,0.9510565f,0.5877852f, -0.5877852f, -0.9510565f }; 
-	const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.3090167f };
+const float PentagramX[6] = { 0.0f,0.0f,0.9510565f,0.5877852f, -0.5877852f, -0.9510565f }; 
+const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.3090167f };
 /*
     1
 4   0   3  
@@ -102,9 +102,9 @@ while(true)
 
 # CallbackTree.h #
 
-**void EnterStdcallCallbackTree(StdcallCallbackTreeFunctionAddress root, void*  sharedParamsAddress);**  
+**void EnterStdcallCallbackTree(StdcallCallbackTreeFunctionAddress root, void *  sharedParamsAddress);**  
 *回调函数类型为 ```void*  __cdecl function(void *);```*   
-**void EnterCdeclCallbackTree(CdeclCallbackTreeFunctionAddress root, void*  sharedParamsAddress);**  
+**void EnterCdeclCallbackTree(CdeclCallbackTreeFunctionAddress root, void *  sharedParamsAddress);**  
 *回调函数类型为 ```void*  __stdcall function(void  *);```*   
 注意：调用约定和函数类型必须匹配！
 CallbackTree流程控制函数，对不同的调用约定应分别使用对应的函数，例如：
