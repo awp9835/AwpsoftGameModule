@@ -65,8 +65,8 @@ while(true)
 
 # AsgmMath.h #
 
-**extern const float PentagramX[6];**
-**extern const float PentagramY[6];**
+**extern const float PentagramX[6];**  
+**extern const float PentagramY[6];**  
 外接圆半径为五角星的中心和五个点坐标。
 ```
 const float PentagramX[6] = { 0.0f,0.0f,0.9510565f,0.5877852f, -0.5877852f, -0.9510565f }; 
