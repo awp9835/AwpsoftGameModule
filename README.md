@@ -37,11 +37,13 @@ AWPSOFT 版权所有 ©2020-2021
 ```
 while(true)
 {
-	if(CoInitialize(NULL) == S_OK)
+	HRESULT resultci = CoInitialize(NULL);
+	if(resultci == S_OK)
 	{
 		CoUninitialize();
 		break;
 	}
+	if(resultci == S_FALSE) CoUninitialize();
 	CoUninitialize();
 }
 ```
@@ -51,11 +53,13 @@ while(true)
 ```
 while(true)
 {
-	if(CoInitialize(NULL) == S_OK)
+	HRESULT resultci = CoInitialize(NULL);
+	if(resultci == S_OK)
 	{
 		CoUninitialize();
 		break;
 	}
+	if(resultci == S_FALSE) CoUninitialize();
 	CoUninitialize();
 }
 ```
