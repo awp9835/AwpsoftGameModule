@@ -88,7 +88,7 @@ const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.30
 快速计算三角函数cos(x * 180/pi)，sin(x * 180/pi)，误差不超过0.0002。 
 
 **float AsgmArctanD(float x);**  
-快速计算反三角函数arctan(x) (-1 <= x <= 1)，结果为角度，误差不超过0.08°。  
+快速计算反三角函数 180/pi * arctan(x) (-1 <= x <= 1)，误差不超过0.08°。  
 
 **float AsgmSqrt1AddX(float x);**  
 快速计算sqrt(1+x) (0 <= x <= 1)，误差不超过0.004。  
@@ -100,7 +100,7 @@ const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.30
 **float AsgmDistance(float deltaX, float deltaY, float deltaZ);**  
 快速计算矢量的欧几里得范数（长度），对长度为1的二维矢量，误差不超过0.004。  
 
-**float AsgmDistanceSquare(float deltaX, float deltaY);**
+**float AsgmDistanceSquare(float deltaX, float deltaY);**  
 **float AsgmDistanceSquare(float deltaX, float deltaY, float deltaZ);**  
 计算矢量的欧几里得范数的平方（长度的平方）。  
 
