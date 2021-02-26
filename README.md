@@ -85,7 +85,7 @@ const float PentagramY[6] = { 0.0f,-1.0f,-0.3090167f,0.8090170f,0.8090170f,-0.30
 
 **float AsgmCosD(float thetaDEG);**  
 **float AsgmSinD(float thetaDEG);**  
-快速计算三角函数cos(x * 180/pi)，sin(x * 180/pi)，误差不超过0.0002。 
+快速计算三角函数cos(x * pi/180)，sin(x * pi/180)，误差不超过0.0002。 
 
 **float AsgmArctanD(float x);**  
 快速计算反三角函数 180/pi * arctan(x) (-1 <= x <= 1)，误差不超过0.08°。  
