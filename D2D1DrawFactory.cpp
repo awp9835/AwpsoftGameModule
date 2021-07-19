@@ -27,7 +27,6 @@ namespace AwpSoftGameModule
 		HRESULT hr;
 		RenderTargetPtr = nullptr;
 		ImageFactoryPtr = nullptr;
-		FrequencyDivide = 1;
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&ImageFactoryPtr);
 		if (FAILED(hr))
@@ -47,6 +46,10 @@ namespace AwpSoftGameModule
 			MessageBox(NULL, L"Create Render Target Failed!", L"Fatal Error!", MB_ICONERROR);
 			exit(0);
 		}
+		CurrentFrequency = 60;
+		LimitFrequency = 60;
+		Counter1 = 0;
+		Counter2 = 0;
 	}
 
 	D2D1DrawFactory::~D2D1DrawFactory()
@@ -103,11 +106,17 @@ namespace AwpSoftGameModule
 
 	bool D2D1DrawFactory::endDraw()
 	{
-		for (int i = 1; i < FrequencyDivide; i++)
+		int limitfreq = min(LimitFrequency, CurrentFrequency);
+		int counterex = Counter1 + CurrentFrequency;
+		Counter2 += limitfreq;
+		while (Counter2 < counterex)
 		{
 			RenderTargetPtr->EndDraw();
 			RenderTargetPtr->BeginDraw();
+			Counter2 += limitfreq;
 		}
+		Counter2 -= counterex;
+		Counter1 = 0;
 		HRESULT hr = RenderTargetPtr->EndDraw();
 		if (FAILED(hr)) return false;
 		return true;
@@ -118,9 +127,18 @@ namespace AwpSoftGameModule
 		RenderTargetPtr->SetDpi(dpi, dpi);
 	}
 
-	void D2D1DrawFactory::setFrequencyDivide(int divide)
+	void D2D1DrawFactory::setLimitFrequency(int limit)
 	{
-		FrequencyDivide = divide;
+		if (limit > 1024) limit = 1024;
+		else if (limit < 1) limit = 1;
+		LimitFrequency = limit;
+	}
+
+	void D2D1DrawFactory::correctCurrentFrequency(int current)
+	{
+		if (current > 1024) current = 1024;
+		else if (current < 1) current = 1;
+		CurrentFrequency = current;
 	}
 
 

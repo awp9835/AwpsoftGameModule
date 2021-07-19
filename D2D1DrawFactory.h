@@ -41,7 +41,7 @@ namespace AwpSoftGameModule
 	class D2D1DrawFactory :protected D2D1Created
 	{
 	protected:
-		int FrequencyDivide;
+		int CurrentFrequency, LimitFrequency, Counter1, Counter2;
 		ID2D1HwndRenderTarget* RenderTargetPtr;
 		IWICImagingFactory* ImageFactoryPtr;
 		ID2D1Bitmap* createImageFromMemory(IWICBitmapDecoder* decorderPtr, unsigned char* buffer, unsigned int size);
@@ -53,7 +53,8 @@ namespace AwpSoftGameModule
 		void beginDraw();
 		bool endDraw();
 		void setDpi(float dpi = 96.0f);
-		void setFrequencyDivide(int divide = 1);
+		void setLimitFrequency(int limit = 60);
+		void correctCurrentFrequency(int current = 60);
 		ID2D1HwndRenderTarget* getInnerHwndRenderTarget();
 		ID2D1Bitmap* createImageFromMemoryBMP(unsigned char* buffer, unsigned int size);
 		ID2D1Bitmap* createImageFromMemoryJPG(unsigned char* buffer, unsigned int size);
