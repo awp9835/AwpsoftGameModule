@@ -278,7 +278,6 @@ namespace AwpSoftGameModule
 		FILE* pfp = _wfopen(targetPackageName, L"wb");
 		if (!pfp)
 		{
-			fclose(pfp);
 			printf("创建目标文件失败");
 			return 0;
 		}
