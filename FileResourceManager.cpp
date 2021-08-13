@@ -115,7 +115,7 @@ namespace AwpSoftGameModule
 	{
 		int scnt = 0;
 		FileResourceInfo frp;
-		FILE* fp;
+		FILE* fp = nullptr;
 		fp = _wfopen(packageFileName, L"rb");
 		if (!fp) return 0;
 		fseek(fp, 0, SEEK_END);
@@ -278,17 +278,29 @@ namespace AwpSoftGameModule
 		FILE* pfp = _wfopen(targetPackageName, L"wb");
 		if (!pfp)
 		{
-			printf("创建目标文件失败");
+			printf("创建目标文件失败\n");
 			return 0;
 		}
-		fwrite(c, 1, 4, pfp);
+		if ((int)fwrite(c, 1, 4, pfp) != 4)
+		{
+			fclose(pfp);
+			printf("IO异常，写入到Package文件失败！\n");
+			return 0;
+		}
 		printf("ID\t类型码   \t附属参数1\t附属参数2\t文件名      \t状态      \t文件大小\n");
 		for (FileResourceInfo& finfo: FileList)
 		{
 			if (finfo.FileID < 0) continue;
-			if ((int)fwrite(finfo.Buffer, 1, finfo.Size, pfp) != finfo.Size)
+			bool failed = false;
+			if ((int)fwrite(&finfo.FileID, sizeof(finfo.FileID), 1, pfp) != 1) failed = true;
+			if ((int)fwrite(&finfo.Type, sizeof(finfo.Type), 1, pfp) != 1) failed = true;
+			if ((int)fwrite(&finfo.Param1, sizeof(finfo.Param1), 1, pfp) != 1) failed = true;
+			if ((int)fwrite(&finfo.Param2, sizeof(finfo.Param2), 1, pfp) != 1) failed = true;
+			if ((int)fwrite(&finfo.Size, sizeof(finfo.Size), 1, pfp) != 1) failed = true;
+			if ((int)fwrite(finfo.Buffer, 1, finfo.Size, pfp) != finfo.Size) failed = true;
+			if (failed)
 			{
-				printf("IO异常，写入到Package文件失败。\n");
+				printf("IO异常，写入到Package文件失败！\n");
 				break;
 			}
 			scnt++;
@@ -331,7 +343,13 @@ namespace AwpSoftGameModule
 			printf("创建目标文件失败");
 			return 0;
 		}
-		fwrite(c, 1, 4, pfp);
+		if ((int)fwrite(c, 1, 4, pfp) != 4)
+		{
+			fclose(pfp);
+			fclose(mfp);
+			printf("IO异常，写入到Package文件失败！\n");
+			return 0;
+		}
 		fwscanf(mfp, L"%d,,,,", &num);
 		printf("共%d个文件\n", num);
 		printf("ID\t类型码   \t附属参数1\t附属参数2\t文件名      \t状态      \t文件大小\n");
@@ -355,11 +373,6 @@ namespace AwpSoftGameModule
 			try
 			{
 				buffer = new unsigned char[fsize];
-				fwrite(&id, sizeof(id), 1, pfp);
-				fwrite(&type, sizeof(type), 1, pfp);
-				fwrite(&p1, sizeof(p1), 1, pfp);
-				fwrite(&p2, sizeof(p2), 1, pfp);
-				fwrite(&fsize, sizeof(fsize), 1, pfp);
 				if ((int)fread(buffer, 1, fsize, ffp) != fsize)
 				{
 					fclose(ffp);
@@ -368,7 +381,14 @@ namespace AwpSoftGameModule
 					continue;
 				}
 				fclose(ffp);
-				if ((int)fwrite(buffer, 1, fsize, pfp) != fsize)
+				bool failed = false;
+				if ((int)fwrite(&id, sizeof(id), 1, pfp) != 1) failed = true;
+				if ((int)fwrite(&type, sizeof(type), 1, pfp) != 1) failed = true;
+				if ((int)fwrite(&p1, sizeof(p1), 1, pfp) != 1) failed = true;
+				if ((int)fwrite(&p2, sizeof(p2), 1, pfp) != 1) failed = true;
+				if ((int)fwrite(&fsize, sizeof(fsize), 1, pfp) != 1) failed = true;
+				if ((int)fwrite(buffer, 1, fsize, pfp) != fsize) failed = true;
+				if (failed)
 				{
 					delete[] buffer;
 					printf("IO异常，写入到Package文件失败！\n");
