@@ -91,7 +91,7 @@ namespace AwpSoftGameModule
 		ID2D1SolidColorBrush *colorBrush = nullptr;
 		HRESULT hr = RenderTargetPtr->CreateSolidColorBrush(textPara.ColorF, (ID2D1SolidColorBrush **)&colorBrush);
 		if (FAILED(hr)) return;
-		D2D1_RECT_F layoutRect = D2D1::RectF(textPara.XLeft, textPara.YTop, textPara.XRight, 4096.0f);
+		D2D1_RECT_F layoutRect = D2D1::RectF(textPara.XLeft, textPara.YTop, textPara.XRight, 65536.0f);
 		if (resetTransform)
 		{
 			RenderTargetPtr->SetTransform(D2D1::Matrix3x2F::Identity());
