@@ -112,6 +112,7 @@ namespace AwpSoftGameModule
 			if (r) delete r;
 			r = nullptr;
 		}
+		Occupied = 0;
 	}
 
 	template<class T>
