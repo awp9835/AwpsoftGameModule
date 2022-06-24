@@ -46,13 +46,13 @@ namespace AwpSoftGameModule
 			return false;
 		}
 		unsigned int temp = KeysOfFunction[functionIndex];
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
+		if ((temp & 0xFF) && GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
+		if ((temp & 0xFF) && GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
+		if ((temp & 0xFF) && GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		temp >>= 8;
-		if (GetAsyncKeyState(temp & 0xFF) < 0) return true;
+		if ((temp & 0xFF) && GetAsyncKeyState(temp & 0xFF) < 0) return true;
 		return false;
 	}
 };
