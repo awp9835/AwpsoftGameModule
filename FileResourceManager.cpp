@@ -136,15 +136,15 @@ namespace AwpSoftGameModule
 			fread(&frp.Param2, sizeof(frp.Param2), 1, fp);
 			fread(&frp.Size, sizeof(frp.Size), 1, fp);
 			fsize -= sizeof(frp.FileID) + sizeof(frp.Type) + sizeof(frp.Param1) + sizeof(frp.Param2) + sizeof(frp.Size);
+			if (frp.Size < 0 || frp.Size > fsize)
+			{
+				break;
+			}
 			if (frp.FileID >= (int)FileList.size() || frp.FileID < 0)
 			{
 				fsize -= frp.Size;
 				fseek(fp, frp.Size, SEEK_CUR);
 				continue;
-			}
-			if (frp.Size > fsize)
-			{
-				break;
 			}
 			try
 			{
@@ -189,15 +189,15 @@ namespace AwpSoftGameModule
 			fread(&frp.Param2, sizeof(frp.Param2), 1, fp);
 			fread(&frp.Size, sizeof(frp.Size), 1, fp);
 			fsize -= sizeof(frp.FileID) + sizeof(frp.Type) + sizeof(frp.Param1) + sizeof(frp.Param2) + sizeof(frp.Size);
+			if (frp.Size < 0 || frp.Size > fsize)
+			{
+				break;
+			}
 			if (frp.FileID < minFileID || frp.FileID > maxFileID || frp.FileID >= (int)FileList.size() || frp.FileID < 0)
 			{
 				fsize -= frp.Size;
 				fseek(fp, frp.Size, SEEK_CUR);
 				continue;
-			}
-			if (frp.Size > fsize)
-			{
-				break;
 			}
 			try
 			{
@@ -242,22 +242,26 @@ namespace AwpSoftGameModule
 			fread(&frp.Param2, sizeof(frp.Param2), 1, fp);
 			fread(&frp.Size, sizeof(frp.Size), 1, fp);
 			fsize -= sizeof(frp.FileID) + sizeof(frp.Type) + sizeof(frp.Param1) + sizeof(frp.Param2) + sizeof(frp.Size);
+			if (frp.Size < 0 || frp.Size > fsize)
+			{
+				break;
+			}
 			if (frp.FileID != fileID)
 			{
 				fsize -= frp.Size;
 				fseek(fp, frp.Size, SEEK_CUR);
 				continue;
 			}
-			if (frp.Size > fsize)
-			{
-				break;
-			}
 			try
 			{
 				frp.Buffer = new unsigned char[frp.Size];
 				fread(frp.Buffer, 1, frp.Size, fp);
 				fsize -= frp.Size;
-				if (takeOverFileResource(frp) >= 0) ssize = frp.Size;
+				if (takeOverFileResource(frp) >= 0)
+				{
+					ssize = frp.Size;
+					break;
+				}
 			}
 			catch (std::bad_alloc&)
 			{
