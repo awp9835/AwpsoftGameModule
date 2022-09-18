@@ -278,7 +278,7 @@ namespace AwpSoftGameModule
 	int FileResourceManager::saveAsPackage(const wchar_t* targetPackageName)
 	{
 		int scnt = 0;
-		CHAR c[5] = "AGFP";
+		char c[5] = "AGFP";
 		FILE* pfp = _wfopen(targetPackageName, L"wb");
 		if (!pfp)
 		{
@@ -331,9 +331,9 @@ namespace AwpSoftGameModule
 		float p1 = 0.0f, p2 = 0.0f;
 		char name[256];
 		FILE *mfp, *ffp, *pfp;
-		LONG fsize = 0;
+		long fsize = 0;
 		unsigned char* buffer;
-		CHAR c[5] = "AGFP";
+		char c[5] = "AGFP";
 		mfp = _wfopen(manifestFileName, L"r");
 		if (!mfp)
 		{
