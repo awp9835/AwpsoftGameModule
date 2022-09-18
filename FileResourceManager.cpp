@@ -291,7 +291,7 @@ namespace AwpSoftGameModule
 			printf("IO异常，写入到Package文件失败！\n");
 			return 0;
 		}
-		printf("ID\t类型码   \t附属参数1\t附属参数2\t文件名      \t状态      \t文件大小\n");
+		printf("ID\t类型码   \t附属参数1\t附属参数2\t状态      \t文件大小\n");
 		for (FileResourceInfo& finfo: FileList)
 		{
 			if (finfo.FileID < 0) continue;
@@ -306,6 +306,14 @@ namespace AwpSoftGameModule
 			{
 				printf("IO异常，写入到Package文件失败！\n");
 				break;
+			}
+			if (finfo.Size / 1024 >= 1024)
+			{
+				printf("%-6d\t0x%-08X\t%-8f\t%-8f\t打包成功\t%-6.2fMB\n", finfo.FileID, finfo.Type, finfo.Param1, finfo.Param2, finfo.Size / 1024.0 / 1024.0);
+			}
+			else
+			{
+				printf("%-6d\t0x%-08X\t%-8f\t%-8f\t打包成功\t%-6.2fKB\n", finfo.FileID, finfo.Type, finfo.Param1, finfo.Param2, finfo.Size / 1024.0);
 			}
 			scnt++;
 		}
