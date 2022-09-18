@@ -27,14 +27,14 @@ namespace AwpSoftGameModule
 	);
 	extern int AsgmJudgeMultipleRelativeCirclesCNT(
 		float originX1, float originY1, float centerOfRotationDEG1,
-		RelativeCircle*circleArray1, int circleCount1,
+		RelativeCircle* circleArray1, int circleCount1,
 		float originX2, float originY2, float centerOfRotationDEG2,
-		RelativeCircle*circleArray2,  int circleCount2
+		RelativeCircle* circleArray2,  int circleCount2
 	);
 	extern bool AsgmJudgeMultipleRelativeCircles(
 		float originX1, float originY1, float centerOfRotationDEG1,
-		RelativeCircle*circleArray1,  int circleCount1,
+		RelativeCircle* circleArray1,  int circleCount1,
 		float originX2, float originY2, float centerOfRotationDEG2,
-		RelativeCircle*circleArray2,  int circleCount2
+		RelativeCircle* circleArray2,  int circleCount2
 	);
 };

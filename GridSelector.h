@@ -28,7 +28,7 @@ namespace AwpSoftGameModule
 		static constexpr auto Attribute_Valid = 0xF0000000;
 		static constexpr auto Attribute_Unlock = 0x0F000000;
 		static constexpr auto Attribute_Enable = 0xFF000000;
-		GridSelector(SelectorMenuStyle style, unsigned short sorts, unsigned short cecondarySorts = 1);
+		GridSelector(SelectorMenuStyle style, unsigned short sorts, unsigned short secondarySorts = 1);
 		virtual ~GridSelector();
 		// Valid:&0xF0000000 Unlock:&&0x0F000000 Value:&0x00FFFFFF
 		void setUnitAttribute(unsigned int attribute, unsigned short id, unsigned short secondaryIndex = 0);
