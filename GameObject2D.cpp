@@ -223,7 +223,7 @@ namespace AwpSoftGameModule
 		if (BoundTrasnform)
 		{
 			DrawFactory->drawStep(getDrawParameters(), true);
-			DrawFactory->drawStep(getDrawParameters(), false);
+			DrawFactory->drawTextStep(getTextParameters(), false);
 		}
 		else
 		{
