@@ -278,7 +278,7 @@ namespace AwpSoftGameModule
 		}
 		decoder->Release();
 		source->Release();
-		return std::move(bitmaps);
+		return bitmaps;
 	}
 
 	DrawParametersD2D1::DrawParametersD2D1()
